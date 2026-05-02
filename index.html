@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Shadowveil: Last Ember</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --dark:    #080613;
+  --dark2:   #0f0b1e;
+  --dark3:   #16122a;
+  --dark4:   #1e1938;
+  --purple:  #7c3aed;
+  --purple2: #a855f7;
+  --purple3: #c084fc;
+  --purple4: #e9d5ff;
+  --gold:    #d4a843;
+  --gold2:   #f0c060;
+  --gold3:   #fde68a;
+  --red:     #ef4444;
+  --red2:    #fca5a5;
+  --green:   #22c55e;
+  --green2:  #86efac;
+  --blue:    #3b82f6;
+  --blue2:   #93c5fd;
+  --text:    #e8e0ff;
+  --muted:   #9d8ec4;
+  --muted2:  #6b5d8a;
+  --border:  rgba(124,58,237,0.2);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  background: var(--dark);
+  color: var(--text);
+  font-family: 'Crimson Text', serif;
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ── STARS ── */
+#stars {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+}
+.star {
+  position: absolute; background: #fff; border-radius: 50%;
+  animation: twinkle var(--d) ease-in-out infinite var(--delay);
+}
+@keyframes twinkle { 0%,100%{opacity:.15} 50%{opacity:.9} }
+
+/* ── SCREENS ── */
+.screen { display: none; position: fixed; inset: 0; z-index: 10; overflow: hidden; }
+.screen.active { display: flex; flex-direction: column; }
+
+/* ─────────────────────────────────────
+   TITLE SCREEN
+───────────────────────────────────── */
+#s-title {
+  align-items: center; justify-content: center; text-align: center;
+  background: radial-gradient(ellipse at 50% 80%, rgba(124,58,237,.18) 0%, transparent 70%), var(--dark);
+  padding: 24px 20px;
+}
+.title-eyebrow {
+  font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 5px;
+  color: var(--purple3); text-transform: uppercase; margin-bottom: 14px;
+  animation: fadeUp 1s ease both;
+}
+.title-logo {
+  font-family: 'Cinzel', serif; font-size: clamp(28px, 9vw, 52px);
+  font-weight: 700; line-height: 1; letter-spacing: 2px;
+  color: #fff; text-shadow: 0 0 50px rgba(124,58,237,.8);
+  animation: fadeUp 1s .15s ease both;
+}
+.title-ember { color: var(--gold); text-shadow: 0 0 30px rgba(212,168,67,.9), 0 0 60px rgba(212,168,67,.4); }
+.crystal-wrap {
+  margin: 22px auto 18px;
+  animation: floatCrystal 5s ease-in-out infinite, fadeUp 1s .3s ease both;
+}
+@keyframes floatCrystal { 0%,100%{transform:translateY(0) rotate(-1deg)} 50%{transform:translateY(-12px) rotate(1deg)} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+.title-tagline {
+  font-size: 15px; color: var(--muted); max-width: 300px; line-height: 1.65;
+  margin: 0 auto 28px; animation: fadeUp 1s .45s ease both;
+}
+.title-meta {
+  font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px;
+  color: var(--muted2); margin-top: 14px;
+  animation: fadeUp 1s .7s ease both;
+}
+.btn-start {
+  font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 3px; text-transform: uppercase;
+  background: linear-gradient(135deg, var(--purple), var(--purple2));
+  color: #fff; border: none; padding: 14px 44px; border-radius: 4px; cursor: pointer;
+  box-shadow: 0 4px 24px rgba(124,58,237,.45);
+  transition: transform .2s, box-shadow .2s;
+  animation: fadeUp 1s .6s ease both;
+}
+.btn-start:active { transform: scale(.97); box-shadow: 0 2px 12px rgba(124,58,237,.3); }
+
+/* ─────────────────────────────────────
+   HERO SELECT
+───────────────────────────────────── */
+#s-heroes {
+  background: var(--dark); flex-direction: column;
+}
+.screen-head {
+  padding: 18px 16px 10px; text-align: center; flex-shrink: 0;
+  background: linear-gradient(to bottom, var(--dark2), transparent);
+}
+.screen-head h2 { font-family: 'Cinzel', serif; font-size: 18px; color: var(--gold); margin-bottom: 4px; }
+.screen-head p  { font-size: 13px; color: var(--muted); }
+
+.heroes-scroll { flex: 1; overflow-y: auto; padding: 12px 14px 20px; }
+
+.hero-card {
+  background: var(--dark3); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px 14px; margin-bottom: 12px;
+  cursor: pointer; transition: all .25s; position: relative; overflow: hidden;
+}
+.hero-card::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--hc), transparent);
+  opacity: 0; transition: opacity .3s;
+}
+.hero-card:active { transform: scale(.985); }
+.hero-card.selected, .hero-card:active { border-color: var(--hc); box-shadow: 0 0 20px rgba(var(--hcr),.25); }
+.hero-card.selected::after { opacity: 1; }
+
+.hcard-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.hcard-icon { font-size: 38px; line-height: 1; }
+.hcard-info { flex: 1; }
+.hcard-name { font-family: 'Cinzel', serif; font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+.hcard-role { font-size: 11px; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; }
+.hcard-desc { font-size: 13px; color: var(--muted); font-style: italic; line-height: 1.5; margin-bottom: 12px; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
+.stat-pill {
+  background: rgba(0,0,0,.3); border-radius: 6px; padding: 6px 8px; text-align: center;
+  border: 1px solid rgba(255,255,255,.05);
+}
+.stat-pill-val { font-family: 'Cinzel', serif; font-size: 15px; font-weight: 600; }
+.stat-pill-lbl { font-size: 9px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 1px; }
+
+.skills-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+.skill-tag {
+  font-size: 10px; padding: 3px 8px; border-radius: 20px;
+  background: rgba(var(--hcr),.12); color: var(--hc);
+  border: 1px solid rgba(var(--hcr),.25); font-family: 'Cinzel', serif; letter-spacing: .5px;
+}
+
+.hero-select-btn {
+  width: 100%; margin-top: 14px; font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 2px;
+  text-transform: uppercase; padding: 11px; border-radius: 6px; cursor: pointer; border: 1px solid var(--hc);
+  background: rgba(var(--hcr),.1); color: var(--hc); transition: all .2s;
+}
+.hero-select-btn:active { background: rgba(var(--hcr),.25); }
+
+/* ─────────────────────────────────────
+   GAME SCREEN
+───────────────────────────────────── */
+#s-game { background: var(--dark2); flex-direction: column; }
+
+/* top hud */
+.hud {
+  display: flex; align-items: center; gap: 8px; padding: 10px 14px 8px;
+  background: rgba(8,6,19,.9); border-bottom: 1px solid var(--border);
+  flex-shrink: 0; backdrop-filter: blur(4px);
+}
+.hud-hero { font-size: 22px; }
+.hud-stats { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.hud-bars { display: flex; flex-direction: column; gap: 3px; }
+.bar-row { display: flex; align-items: center; gap: 6px; }
+.bar-icon { font-size: 9px; width: 12px; text-align: center; color: var(--muted); }
+.bar-track { flex: 1; height: 5px; background: rgba(255,255,255,.08); border-radius: 3px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 3px; transition: width .4s ease; }
+.bar-hp  { background: linear-gradient(90deg, #dc2626, #ef4444); }
+.bar-mp  { background: linear-gradient(90deg, #1d4ed8, #3b82f6); }
+.bar-xp  { background: linear-gradient(90deg, #7c3aed, #a855f7); }
+.bar-val { font-size: 9px; color: var(--muted); width: 36px; text-align: right; }
+.hud-right { text-align: right; }
+.hud-gold { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold); }
+.hud-loc  { font-size: 9px; color: var(--muted); letter-spacing: .5px; margin-top: 2px; }
+.hud-turn { font-size: 9px; color: var(--muted2); margin-top: 1px; }
+
+/* scene */
+.scene-img { height: 160px; width: 100%; overflow: hidden; position: relative; flex-shrink: 0; }
+.scene-img svg { width: 100%; height: 100%; display: block; }
+.scene-fade {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 70px;
+  background: linear-gradient(transparent, var(--dark2));
+}
+.scene-loc-badge {
+  position: absolute; top: 10px; left: 12px;
+  background: rgba(8,6,19,.75); backdrop-filter: blur(8px);
+  border: 1px solid var(--border); border-radius: 20px;
+  padding: 4px 12px; font-family: 'Cinzel', serif; font-size: 9px;
+  letter-spacing: 1.5px; color: var(--purple3); text-transform: uppercase;
+}
+
+/* narrative */
+.narrative-wrap { flex: 1; overflow-y: auto; padding: 10px 14px 6px; }
+.narr-box {
+  padding: 12px 14px; border-radius: 10px; margin-bottom: 8px;
+  font-size: 15px; line-height: 1.7; border: 1px solid;
+  animation: narr-in .3s ease both;
+}
+@keyframes narr-in { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.narr-story  { background: rgba(22,18,42,.8); border-color: rgba(124,58,237,.18); color: var(--text); }
+.narr-system { background: rgba(17,13,34,.6); border-color: rgba(212,168,67,.15); color: var(--gold2); font-style: italic; font-size: 13px; }
+.narr-combat { background: rgba(30,8,8,.7); border-color: rgba(239,68,68,.25); color: var(--red2); }
+.narr-loot   { background: rgba(20,14,4,.7); border-color: rgba(212,168,67,.25); color: var(--gold3); }
+.narr-success{ background: rgba(4,20,10,.7); border-color: rgba(34,197,94,.25); color: var(--green2); }
+.narr-win    { background: rgba(10,6,20,.8); border-color: rgba(192,132,252,.4); color: var(--purple4); }
+
+/* choices */
+.choices-wrap {
+  padding: 8px 14px 12px; background: rgba(8,6,19,.95);
+  border-top: 1px solid var(--border); flex-shrink: 0;
+}
+.choices-label {
+  font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2.5px;
+  color: var(--purple3); text-transform: uppercase; margin-bottom: 6px;
+}
+.choice-btn {
+  width: 100%; text-align: left; background: rgba(22,18,42,.6);
+  border: 1px solid rgba(124,58,237,.2); border-radius: 8px;
+  padding: 10px 13px; margin-bottom: 6px; cursor: pointer;
+  font-family: 'Crimson Text', serif; font-size: 14px; color: var(--text);
+  transition: all .18s; line-height: 1.35;
+}
+.choice-btn:active { background: rgba(124,58,237,.18); border-color: var(--purple); }
+.choice-btn:last-child { margin-bottom: 0; }
+
+/* ─────────────────────────────────────
+   COMBAT SCREEN
+───────────────────────────────────── */
+#s-combat {
+  background: radial-gradient(ellipse at 50% 40%, rgba(100,10,10,.35) 0%, var(--dark) 70%);
+  flex-direction: column; align-items: center; justify-content: flex-start;
+  padding: 20px 16px 16px; overflow-y: auto;
+}
+.combat-header {
+  text-align: center; margin-bottom: 18px;
+  font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 3px;
+  color: var(--red2); text-transform: uppercase;
+}
+.combat-arena {
+  display: flex; align-items: center; gap: 16px; width: 100%; max-width: 340px; margin-bottom: 16px;
+}
+.fighter { flex: 1; text-align: center; }
+.fighter-icon { font-size: 50px; display: block; margin-bottom: 6px; animation: fightBob 2s ease-in-out infinite; }
+.enemy-icon   { animation-delay: 1s; }
+@keyframes fightBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+.fighter-name { font-family: 'Cinzel', serif; font-size: 12px; margin-bottom: 5px; }
+.fighter-hp-text { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.fighter-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; max-width: 110px; margin: 0 auto; }
+.fighter-bar-fill { height: 100%; border-radius: 3px; transition: width .4s; }
+.fighter-bar-hero { background: linear-gradient(90deg,#dc2626,#ef4444); }
+.fighter-bar-enemy{ background: linear-gradient(90deg,#7c3aed,#a855f7); }
+.vs-badge { font-family: 'Cinzel', serif; font-size: 18px; color: var(--muted2); flex-shrink: 0; }
+
+.combat-log {
+  width: 100%; max-width: 360px; background: rgba(12,8,24,.8);
+  border: 1px solid rgba(239,68,68,.2); border-radius: 8px;
+  padding: 10px 12px; height: 100px; overflow-y: auto;
+  font-size: 12px; line-height: 1.7; margin-bottom: 14px;
+}
+.cl-hero   { color: var(--blue2); }
+.cl-enemy  { color: var(--red2); }
+.cl-system { color: var(--muted); font-style: italic; }
+.cl-win    { color: var(--green2); font-weight: 600; }
+.cl-lose   { color: var(--red); font-weight: 600; }
+
+.combat-actions {
+  width: 100%; max-width: 360px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+.combat-btn {
+  font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+  padding: 12px 8px; border-radius: 8px; cursor: pointer; border: 1px solid;
+  background: transparent; transition: all .18s; line-height: 1.2;
+}
+.combat-btn:active { transform: scale(.96); }
+.cb-attack  { border-color: var(--red);    color: var(--red);    }
+.cb-attack:active  { background: rgba(239,68,68,.15); }
+.cb-magic   { border-color: var(--blue2);  color: var(--blue2);  }
+.cb-magic:active   { background: rgba(59,130,246,.15); }
+.cb-special { border-color: var(--gold);   color: var(--gold);   }
+.cb-special:active { background: rgba(212,168,67,.15); }
+.cb-flee    { border-color: var(--muted2); color: var(--muted2); }
+.cb-flee:active    { background: rgba(107,93,138,.15); }
+.cb-potion  { border-color: var(--green);  color: var(--green);  }
+.cb-potion:active  { background: rgba(34,197,94,.15); }
+.combat-btn:disabled { opacity: .35; pointer-events: none; }
+
+/* ─────────────────────────────────────
+   INVENTORY / MAP / STATS PANEL
+───────────────────────────────────── */
+#s-panel {
+  background: var(--dark2); flex-direction: column;
+}
+.panel-tabs {
+  display: flex; border-bottom: 1px solid var(--border);
+  background: rgba(8,6,19,.9); flex-shrink: 0;
+}
+.panel-tab {
+  flex: 1; padding: 12px 4px; text-align: center; cursor: pointer;
+  font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px;
+  color: var(--muted); border-bottom: 2px solid transparent; transition: all .2s;
+}
+.panel-tab.active { color: var(--purple3); border-bottom-color: var(--purple); }
+.panel-tab-icon { font-size: 18px; display: block; margin-bottom: 3px; }
+.panel-body { flex: 1; overflow-y: auto; padding: 14px; }
+
+/* stats tab */
+.stats-section { margin-bottom: 18px; }
+.section-title { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px; color: var(--purple3); text-transform: uppercase; margin-bottom: 10px; }
+.stat-row2 { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.04); font-size: 13px; }
+.stat-row2:last-child { border-bottom: none; }
+.sr-label { color: var(--muted); }
+.sr-val   { font-family: 'Cinzel', serif; color: var(--text); }
+
+/* inventory tab */
+.inv-item {
+  display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+  background: var(--dark3); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px;
+}
+.inv-item-icon { font-size: 22px; width: 32px; text-align: center; }
+.inv-item-info { flex: 1; }
+.inv-item-name { font-size: 14px; margin-bottom: 2px; }
+.inv-item-desc { font-size: 11px; color: var(--muted); }
+.inv-use-btn {
+  font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px; padding: 5px 10px;
+  border: 1px solid var(--green); color: var(--green); background: transparent;
+  border-radius: 4px; cursor: pointer;
+}
+
+/* map tab */
+.map-zone {
+  background: var(--dark3); border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: flex-start; gap: 12px;
+}
+.map-zone-icon { font-size: 28px; flex-shrink: 0; }
+.map-zone-info { flex: 1; }
+.map-zone-name { font-family: 'Cinzel', serif; font-size: 13px; margin-bottom: 3px; }
+.map-zone-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+.map-zone-status {
+  font-size: 9px; letter-spacing: 1px; padding: 2px 8px; border-radius: 10px;
+  font-family: 'Cinzel', serif; margin-top: 6px; display: inline-block;
+}
+.mz-done    { background: rgba(34,197,94,.12); color: var(--green); border: 1px solid rgba(34,197,94,.2); }
+.mz-current { background: rgba(124,58,237,.12); color: var(--purple3); border: 1px solid rgba(124,58,237,.2); }
+.mz-locked  { background: rgba(107,93,138,.1); color: var(--muted2); border: 1px solid rgba(107,93,138,.15); }
+
+/* bottom nav */
+.bottom-nav {
+  display: flex; border-top: 1px solid var(--border);
+  background: rgba(8,6,19,.95); flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom);
+}
+.nav-btn {
+  flex: 1; padding: 10px 4px; cursor: pointer; background: transparent; border: none;
+  font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1px;
+  color: var(--muted2); text-align: center; transition: color .2s;
+  text-transform: uppercase;
+}
+.nav-btn.active { color: var(--purple3); }
+.nav-btn-icon { font-size: 20px; display: block; margin-bottom: 3px; }
+
+/* ─────────────────────────────────────
+   END SCREEN
+───────────────────────────────────── */
+#s-end {
+  align-items: center; justify-content: center; text-align: center;
+  padding: 30px 20px;
+}
+.end-emblem { font-size: 80px; display: block; margin-bottom: 18px; animation: endPulse 2s ease-in-out infinite; }
+@keyframes endPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.07)} }
+.end-title { font-family: 'Cinzel', serif; font-size: 28px; font-weight: 700; margin-bottom: 10px; }
+.end-desc  { font-size: 15px; color: var(--muted); max-width: 280px; line-height: 1.6; margin: 0 auto 24px; }
+.end-grid  { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 24px; width: 100%; max-width: 320px; }
+.end-cell  { background: var(--dark3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 6px; }
+.end-cell-val { font-family: 'Cinzel', serif; font-size: 20px; color: var(--gold); display: block; }
+.end-cell-lbl { font-size: 10px; color: var(--muted); }
+.btn-restart {
+  font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  background: linear-gradient(135deg, var(--purple), var(--purple2));
+  color: #fff; border: none; padding: 13px 36px; border-radius: 4px; cursor: pointer;
+}
+
+/* ── NOTIFICATION TOAST ── */
+.toast {
+  position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
+  background: rgba(22,18,42,.95); border: 1px solid var(--purple);
+  border-radius: 20px; padding: 8px 18px;
+  font-family: 'Cinzel', serif; font-size: 12px; color: var(--gold2);
+  z-index: 999; white-space: nowrap;
+  animation: toastAnim .35s ease both;
+  pointer-events: none;
+}
+@keyframes toastAnim { from{opacity:0;transform:translateX(-50%) translateY(-8px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--muted2); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<!-- ══════ TITLE ══════ -->
+<div class="screen active" id="s-title">
+  <div class="title-eyebrow">✦ тёмное фэнтези RPG ✦</div>
+  <svg class="crystal-wrap" width="100" height="120" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="cgrad" cx="38%" cy="28%">
+        <stop offset="0%" stop-color="#f3e8ff"/>
+        <stop offset="55%" stop-color="#a855f7"/>
+        <stop offset="100%" stop-color="#3b0764"/>
+      </radialGradient>
+      <radialGradient id="glowg" cx="50%" cy="50%">
+        <stop offset="0%" stop-color="#a855f7" stop-opacity=".5"/>
+        <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <ellipse cx="50" cy="105" rx="32" ry="10" fill="url(#glowg)"/>
+    <polygon points="50,5 27,68 50,84 73,68" fill="url(#cgrad)"/>
+    <polygon points="50,5 73,68 50,84 50,38" fill="#6d28d9" opacity=".75"/>
+    <polygon points="50,38 27,68 50,84" fill="#3b0764" opacity=".85"/>
+    <line x1="50" y1="5" x2="27" y2="68" stroke="#c084fc" stroke-width=".6" opacity=".6"/>
+    <line x1="50" y1="5" x2="73" y2="68" stroke="#c084fc" stroke-width=".6" opacity=".6"/>
+    <circle cx="53" cy="11" r="3" fill="#fff" opacity=".75"/>
+  </svg>
+  <div class="title-logo">SHADOWVEIL<br><span class="title-ember">LAST EMBER</span></div>
+  <div class="title-tagline">Вечные Тени поглощают мир. Найди кристалл — или сгинь во тьме навсегда.</div>
+  <button class="btn-start" onclick="G.showScreen('heroes')">⚔ Начать путь</button>
+  <div class="title-meta">RPG · PC · 16+ · ~40 ч · 12 локаций · 3 героя</div>
+</div>
+
+<!-- ══════ HERO SELECT ══════ -->
+<div class="screen" id="s-heroes">
+  <div class="screen-head">
+    <h2>Выбери героя</h2>
+    <p>Три пути — три судьбы</p>
+  </div>
+  <div class="heroes-scroll" id="heroes-list">
+    <!-- injected by JS -->
+  </div>
+</div>
+
+<!-- ══════ GAME ══════ -->
+<div class="screen" id="s-game">
+  <!-- HUD -->
+  <div class="hud">
+    <div class="hud-hero" id="hud-icon">⚔️</div>
+    <div class="hud-stats">
+      <div class="hud-bars">
+        <div class="bar-row">
+          <span class="bar-icon">♥</span>
+          <div class="bar-track"><div class="bar-fill bar-hp" id="bar-hp" style="width:100%"></div></div>
+          <span class="bar-val" id="txt-hp">100</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-icon">✦</span>
+          <div class="bar-track"><div class="bar-fill bar-mp" id="bar-mp" style="width:100%"></div></div>
+          <span class="bar-val" id="txt-mp">60</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-icon">☆</span>
+          <div class="bar-track"><div class="bar-fill bar-xp" id="bar-xp" style="width:0%"></div></div>
+          <span class="bar-val" id="txt-xp">0</span>
+        </div>
+      </div>
+    </div>
+    <div class="hud-right">
+      <div class="hud-gold" id="hud-gold">0 ◆</div>
+      <div class="hud-loc"  id="hud-loc">Руины Аэлора</div>
+      <div class="hud-turn" id="hud-turn">Ход 1</div>
+    </div>
+  </div>
+
+  <!-- Scene -->
+  <div class="scene-img" id="scene-img">
+    <div class="scene-fade"></div>
+    <div class="scene-loc-badge" id="scene-loc-badge">Руины Аэлора</div>
+  </div>
+
+  <!-- Narrative -->
+  <div class="narrative-wrap" id="narrative-wrap"></div>
+
+  <!-- Choices -->
+  <div class="choices-wrap">
+    <div class="choices-label">✦ Твой выбор</div>
+    <div id="choices-list"></div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <button class="nav-btn active" id="nav-story" onclick="G.navTo('story')">
+      <span class="nav-btn-icon">📖</span>История
+    </button>
+    <button class="nav-btn" id="nav-panel" onclick="G.navTo('panel')">
+      <span class="nav-btn-icon">🎒</span>Меню
+    </button>
+  </div>
+</div>
+
+<!-- ══════ PANEL (Inventory/Map/Stats) ══════ -->
+<div class="screen" id="s-panel">
+  <div class="panel-tabs">
+    <div class="panel-tab active" id="tab-inv" onclick="G.panelTab('inv')">
+      <span class="panel-tab-icon">🎒</span>Инвентарь
+    </div>
+    <div class="panel-tab" id="tab-map" onclick="G.panelTab('map')">
+      <span class="panel-tab-icon">🗺️</span>Карта
+    </div>
+    <div class="panel-tab" id="tab-stats" onclick="G.panelTab('stats')">
+      <span class="panel-tab-icon">📊</span>Герой
+    </div>
+  </div>
+  <div class="panel-body" id="panel-body"></div>
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <button class="nav-btn" id="nav-story2" onclick="G.navTo('story')">
+      <span class="nav-btn-icon">📖</span>История
+    </button>
+    <button class="nav-btn active" id="nav-panel2" onclick="G.navTo('panel')">
+      <span class="nav-btn-icon">🎒</span>Меню
+    </button>
+  </div>
+</div>
+
+<!-- ══════ COMBAT ══════ -->
+<div class="screen" id="s-combat">
+  <div class="combat-header" id="combat-header">⚔ БИТВА!</div>
+  <div class="combat-arena">
+    <div class="fighter">
+      <span class="fighter-icon" id="c-hero-ico">⚔️</span>
+      <div class="fighter-name" id="c-hero-name">Кейра</div>
+      <div class="fighter-hp-text" id="c-hero-hp">100 HP</div>
+      <div class="fighter-bar"><div class="fighter-bar-fill fighter-bar-hero" id="c-hero-bar" style="width:100%"></div></div>
+    </div>
+    <div class="vs-badge">VS</div>
+    <div class="fighter">
+      <span class="fighter-icon enemy-icon" id="c-enemy-ico">👹</span>
+      <div class="fighter-name" id="c-enemy-name">Враг</div>
+      <div class="fighter-hp-text" id="c-enemy-hp">50 HP</div>
+      <div class="fighter-bar"><div class="fighter-bar-fill fighter-bar-enemy" id="c-enemy-bar" style="width:100%"></div></div>
+    </div>
+  </div>
+  <div class="combat-log" id="combat-log"></div>
+  <div class="combat-actions">
+    <button class="combat-btn cb-attack"  onclick="G.fight('attack')">⚔ Атака</button>
+    <button class="combat-btn cb-magic"   onclick="G.fight('magic')"  id="cb-magic">✦ Магия</button>
+    <button class="combat-btn cb-special" onclick="G.fight('special')" id="cb-special">★ Спецприём</button>
+    <button class="combat-btn cb-potion"  onclick="G.fight('potion')" id="cb-potion">🧪 Зелье</button>
+    <button class="combat-btn cb-flee"    onclick="G.fight('flee')"   style="grid-column:span 2">↩ Бежать</button>
+  </div>
+</div>
+
+<!-- ══════ END ══════ -->
+<div class="screen" id="s-end">
+  <span class="end-emblem" id="end-emblem">💀</span>
+  <div class="end-title" id="end-title">Тьма победила</div>
+  <div class="end-desc"  id="end-desc">Вечные Тени поглотили последнюю искру.</div>
+  <div class="end-grid">
+    <div class="end-cell"><span class="end-cell-val" id="e-turns">0</span><div class="end-cell-lbl">Ходов</div></div>
+    <div class="end-cell"><span class="end-cell-val" id="e-kills">0</span><div class="end-cell-lbl">Врагов</div></div>
+    <div class="end-cell"><span class="end-cell-val" id="e-xp">0</span><div class="end-cell-lbl">Опыта</div></div>
+  </div>
+  <button class="btn-restart" onclick="G.restart()">↺ Новая игра</button>
+</div>
+
+<script>
+// ════════════════════════════════════
+//  TELEGRAM WEBAPP INIT
+// ════════════════════════════════════
+const twa = window.Telegram?.WebApp;
+if (twa) {
+  twa.ready();
+  twa.expand();
+  twa.enableClosingConfirmation();
+  if (twa.colorScheme === 'dark' || true) {
+    twa.setHeaderColor('#080613');
+    twa.setBackgroundColor('#080613');
+  }
+}
+
+// ════════════════════════════════════
+//  STARS
+// ════════════════════════════════════
+(function(){
+  const c = document.getElementById('stars');
+  for (let i = 0; i < 70; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 1.8 + .6;
+    s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;width:${sz}px;height:${sz}px;--d:${2+Math.random()*4}s;--delay:${-Math.random()*5}s`;
+    c.appendChild(s);
+  }
+})();
+
+// ════════════════════════════════════
+//  DATA
+// ════════════════════════════════════
+const HEROES = {
+  keira: {
+    id:'keira', name:'Кейра', role:'Воин · Страж', icon:'⚔️',
+    desc:'Непоколебимый щит. Принимает удары, которые убивают других. Её сила — в броне и стойкости.',
+    hp:120, maxHp:120, mp:40, maxMp:40, str:18, mag:5, agi:10,
+    special:'Щитовой удар', specialMp:15, color:'#c084fc', colorR:'192,132,252',
+    skills:['Блок','Провокация','Щитовой удар','Ярость'],
+    startItems:['Длинный меч','Зелье здоровья ×2','Щит стража']
+  },
+  toris: {
+    id:'toris', name:'Торис', role:'Маг · Шаман', icon:'🌿',
+    desc:'Голос духов и природы. Исцеляет союзников, сжигает врагов — решать духам.',
+    hp:80, maxHp:80, mp:100, maxMp:100, str:8, mag:20, agi:12,
+    special:'Духовный вихрь', specialMp:30, color:'#86efac', colorR:'134,239,172',
+    skills:['Огненный шар','Исцеление','Духовный вихрь','Проклятие'],
+    startItems:['Магический посох','Зелье здоровья','Книга духов','Зелье маны ×2']
+  },
+  zara: {
+    id:'zara', name:'Зара', role:'Лазутчик · Тень', icon:'🗡️',
+    desc:'Невидима до первого удара. Каждый бой — работа, каждый враг — контракт.',
+    hp:90, maxHp:90, mp:60, maxMp:60, str:12, mag:10, agi:20,
+    special:'Удар в тень', specialMp:20, color:'#fdba74', colorR:'253,186,116',
+    skills:['Скрытность','Яд','Удар в тень','Уклонение'],
+    startItems:['Пара кинжалов','Зелье здоровья ×2','Дымовая бомба','Яд ×3']
+  }
+};
+
+const ENEMIES = [
+  {name:'Теневой страж',     icon:'👤', hp:45,  atk:10, mag:4,  xp:30,  gold:15, flee:0.5},
+  {name:'Призрак Аэлора',    icon:'👻', hp:35,  atk:7,  mag:16, xp:25,  gold:10, flee:0.55},
+  {name:'Лесной демон',      icon:'🌑', hp:55,  atk:13, mag:8,  xp:40,  gold:18, flee:0.45},
+  {name:'Ледяной тролль',    icon:'🧊', hp:80,  atk:20, mag:2,  xp:55,  gold:28, flee:0.35},
+  {name:'Страж тьмы',        icon:'💀', hp:65,  atk:16, mag:12, xp:60,  gold:32, flee:0.4},
+  {name:'Теневой дракон',    icon:'🐉', hp:160, atk:28, mag:22, xp:180, gold:90, flee:0.1},
+];
+
+const LOCATIONS = [
+  {id:'ruins',     name:'Руины Аэлора',   region:'Локация 1/12', scene:'ruins'},
+  {id:'forest',    name:'Чёрный лес',     region:'Локация 3/12', scene:'forest'},
+  {id:'mountains', name:'Горы холода',    region:'Локация 7/12', scene:'mountains'},
+  {id:'cave',      name:'Пещера Эмбера',  region:'Локация 12/12',scene:'cave'},
+];
+
+const ITEMS_DB = {
+  'Зелье здоровья':  {icon:'🧪', desc:'Восстанавливает 35% HP', type:'hp',  val:0.35},
+  'Зелье маны':      {icon:'💧', desc:'Восстанавливает 40 MP',  type:'mp',  val:40},
+  'Зелье здоровья ×2':{icon:'🧪',desc:'Восстанавливает 35% HP', type:'hp', val:0.35, count:2},
+  'Зелье маны ×2':   {icon:'💧', desc:'Восстанавливает 40 MP',  type:'mp',  val:40, count:2},
+  'Дымовая бомба':   {icon:'💨', desc:'Гарантированный побег',  type:'flee',val:1},
+  'Яд ×3':           {icon:'☠️', desc:'+20 урона к следующей атаке', type:'poison', val:20, count:3},
+  'Длинный меч':     {icon:'⚔️', desc:'Пассивно: +3 к Силе',   type:'equip',val:0},
+  'Магический посох':{icon:'🪄', desc:'Пассивно: +4 к Магии',  type:'equip',val:0},
+  'Пара кинжалов':   {icon:'🗡️', desc:'Пассивно: +3 к Ловкости', type:'equip',val:0},
+  'Книга духов':     {icon:'📖', desc:'Пассивно: +2 к Магии',  type:'equip',val:0},
+  'Щит стража':      {icon:'🛡️', desc:'Пассивно: -2 урон от врагов', type:'equip',val:0},
+  'Осколок Эмбера':  {icon:'💎', desc:'Ключевой предмет',      type:'key',  val:0},
+  'Старая карта':    {icon:'🗺️', desc:'Открывает путь',        type:'key',  val:0},
+  'Факел':           {icon:'🔦', desc:'Освещает путь во тьме', type:'key',  val:0},
+};
+
+// ════════════════════════════════════
+//  SCENES SVG
+// ════════════════════════════════════
+const SCENES = {
+ruins: `<svg viewBox="0 0 360 160" xmlns="http://www.w3.org/2000/svg"><rect width="360" height="160" fill="#0d0a1a"/>
+<circle cx="45" cy="18" r=".9" fill="#fff" opacity=".6"/><circle cx="110" cy="11" r=".7" fill="#fff" opacity=".5"/>
+<circle cx="210" cy="8" r="1" fill="#fff" opacity=".7"/><circle cx="300" cy="16" r=".8" fill="#fff" opacity=".6"/>
+<circle cx="340" cy="9" r=".6" fill="#fff" opacity=".5"/><circle cx="260" cy="28" r=".5" fill="#fff" opacity=".4"/>
+<polygon points="0,120 45,75 90,105 150,52 210,90 270,45 315,75 360,60 360,160 0,160" fill="#130e2b"/>
+<polygon points="0,160 0,132 60,98 120,124 195,79 255,112 315,72 360,94 360,160" fill="#1c1340"/>
+<rect x="22" y="94" width="11" height="42" fill="#241a45" rx="2"/>
+<rect x="18" y="90" width="18" height="7" fill="#2e2255" rx="1"/>
+<rect x="42" y="106" width="8" height="30" fill="#241a45" rx="1"/>
+<rect x="316" y="96" width="12" height="40" fill="#241a45" rx="2"/>
+<rect x="311" y="91" width="20" height="7" fill="#2e2255" rx="1"/>
+<polygon points="180,62 164,109 180,119 196,109" fill="#c084fc"/>
+<polygon points="180,62 196,109 180,119 180,88" fill="#9333ea"/>
+<ellipse cx="180" cy="124" rx="22" ry="6" fill="#7c3aed" opacity=".3"/>
+<circle cx="183" cy="67" r="2.5" fill="#fff" opacity=".8"/>
+</svg>`,
+
+forest: `<svg viewBox="0 0 360 160" xmlns="http://www.w3.org/2000/svg"><rect width="360" height="160" fill="#060d08"/>
+<polygon points="0,160 0,60 22,75 45,38 68,60 90,30 112,53 135,22 157,45 180,15 202,42 225,22 247,45 270,27 292,50 315,30 337,53 360,35 360,160" fill="#0d1f12"/>
+<polygon points="0,160 0,90 38,75 75,98 112,67 150,86 187,60 225,83 262,64 300,87 338,67 360,83 360,160" fill="#112018"/>
+<line x1="60" y1="160" x2="60" y2="60" stroke="#0a1a0e" stroke-width="6"/>
+<ellipse cx="60" cy="54" rx="17" ry="22" fill="#122015"/>
+<line x1="115" y1="160" x2="115" y2="72" stroke="#0a1a0e" stroke-width="5"/>
+<ellipse cx="115" cy="66" rx="14" ry="18" fill="#0e1c12"/>
+<line x1="255" y1="160" x2="255" y2="64" stroke="#0a1a0e" stroke-width="6"/>
+<ellipse cx="255" cy="58" rx="16" ry="20" fill="#122015"/>
+<line x1="315" y1="160" x2="315" y2="68" stroke="#0a1a0e" stroke-width="5"/>
+<ellipse cx="315" cy="62" rx="13" ry="17" fill="#0e1c12"/>
+<circle cx="180" cy="80" r="10" fill="#22c55e" opacity=".12"/>
+<circle cx="180" cy="80" r="5"  fill="#86efac" opacity=".25"/>
+<circle cx="180" cy="80" r="2"  fill="#a7f3d0" opacity=".6"/>
+</svg>`,
+
+mountains: `<svg viewBox="0 0 360 160" xmlns="http://www.w3.org/2000/svg"><rect width="360" height="160" fill="#080c1a"/>
+<circle cx="40" cy="16" r=".9" fill="#fff" opacity=".7"/>
+<circle cx="136" cy="9" r="1" fill="#fff" opacity=".8"/>
+<circle cx="225" cy="6" r=".8" fill="#fff" opacity=".6"/>
+<circle cx="324" cy="12" r=".9" fill="#fff" opacity=".7"/>
+<polygon points="0,160 45,60 90,105 150,38 210,98 270,30 315,76 360,45 360,160" fill="#0e1528"/>
+<polygon points="150,38 112,160 188,160" fill="#162035"/>
+<polygon points="270,30 240,160 300,160" fill="#111d30"/>
+<polygon points="150,38 134,76 166,76" fill="#d1d5db" opacity=".12"/>
+<polygon points="270,30 255,72 285,72" fill="#d1d5db" opacity=".1"/>
+<rect x="0" y="115" width="360" height="45" fill="#0a1020" opacity=".75"/>
+<rect x="120" y="90" width="3" height="32" fill="#60a5fa" opacity=".25"/>
+<rect x="233" y="82" width="3" height="40" fill="#60a5fa" opacity=".18"/>
+</svg>`,
+
+cave: `<svg viewBox="0 0 360 160" xmlns="http://www.w3.org/2000/svg"><rect width="360" height="160" fill="#0a0715"/>
+<path d="M0,0 Q45,22 75,0 Q112,30 150,8 Q188,36 225,10 Q262,34 300,7 Q330,26 360,0 L360,75 Q300,60 262,90 Q225,68 180,98 Q135,71 98,94 Q60,68 0,83Z" fill="#110e24"/>
+<path d="M0,160 Q60,106 105,120 Q150,105 180,128 Q210,108 255,122 Q300,106 360,120 L360,160Z" fill="#160f2e"/>
+<ellipse cx="180" cy="135" rx="55" ry="16" fill="#7c3aed" opacity=".25"/>
+<ellipse cx="180" cy="132" rx="30" ry="9"  fill="#a855f7" opacity=".35"/>
+<polygon points="180,30 158,90 180,105 202,90" fill="#c084fc" opacity=".95"/>
+<polygon points="180,30 202,90 180,105 180,60" fill="#9333ea"/>
+<polygon points="180,60 158,90 180,105" fill="#4c1d95" opacity=".9"/>
+<circle cx="183" cy="35" r="3.5" fill="#fff" opacity=".85"/>
+<circle cx="181" cy="32" r="1.8" fill="#e9d5ff"/>
+<line x1="180" y1="105" x2="180" y2="130" stroke="#7c3aed" stroke-width="1" opacity=".5"/>
+<circle cx="90"  cy="60" r="1.5" fill="#c084fc" opacity=".4"/>
+<circle cx="270" cy="68" r="1.2" fill="#c084fc" opacity=".35"/>
+<circle cx="60"  cy="82" r=".9"  fill="#a855f7" opacity=".3"/>
+<circle cx="300" cy="78" r="1.2" fill="#a855f7" opacity=".3"/>
+</svg>`,
+};
+
+// ════════════════════════════════════
+//  STORY NODES
+// ════════════════════════════════════
+const STORY = [
+  // 0 — INTRO
+  {
+    loc:0, scene:'ruins', type:'story',
+    text:'Развалины великой столицы Аэлора встречают тебя гробовой тишиной. Тень ползёт по камням — живая, голодная. Вдали мерцает фиолетовый свет. Это не факел.',
+    choices:[
+      {text:'⚔ Идти к свету', next:1},
+      {text:'🔍 Осмотреть руины', next:2},
+      {text:'👂 Прислушаться к тишине', next:3},
+    ]
+  },
+  // 1 — к свету → бой
+  {
+    loc:0, scene:'ruins', type:'story',
+    text:'Свет исходит от осколка в стене — слабого, умирающего. Стоит потянуться рукой, как из тени вырастает силуэт. Теневой страж. Он охраняет даже мёртвое.',
+    choices:[{text:'⚔ Принять бой!', next:'combat:0:4'}]
+  },
+  // 2 — осмотр → лут
+  {
+    loc:0, scene:'ruins', type:'loot', gold:15, xp:10,
+    text:'Среди обломков ты находишь ветхий дневник. Последняя запись: "Кристалл в Пещере Эмбера. Тени боятся его света. Торопитесь." Ты находишь 15 золота.',
+    choices:[
+      {text:'📖 Запомнить путь', next:5},
+      {text:'⚔ Двигаться немедля', next:5},
+    ]
+  },
+  // 3 — прислушаться → призрак
+  {
+    loc:0, scene:'ruins', type:'combat',
+    text:'Ты слышишь шёпот: "Отступи... или умри здесь." Из тени поднимается призрак Аэлора. Его глаза — пустые колодцы тьмы.',
+    choices:[{text:'⚔ Сразиться с призраком!', next:'combat:1:5'}]
+  },
+  // 4 — после боя: страж
+  {
+    loc:0, scene:'ruins', type:'success', xp:20, item:'Осколок Эмбера',
+    text:'Страж повержен. В руке у тебя — осколок кристалла. Он слабо пульсирует. Живой.',
+    choices:[{text:'🌲 Идти в Чёрный лес', next:6}]
+  },
+  // 5 — общий переход в лес
+  {
+    loc:0, scene:'ruins', type:'story',
+    text:'Ты покидаешь руины Аэлора. Путь лежит в Чёрный лес — там живут духи и шаманы. Говорят, они знают дорогу к кристаллу.',
+    choices:[{text:'🌲 Войти в Чёрный лес', next:6}]
+  },
+  // 6 — лес
+  {
+    loc:1, scene:'forest', type:'story',
+    text:'Чёрный лес. Здесь не бывает тишины: лес дышит, шепчет, смотрит. Светлячки горят не тем цветом. Между деревьями — движение.',
+    choices:[
+      {text:'🗣 Позвать духов', next:7},
+      {text:'🤫 Красться сквозь лес', next:8},
+      {text:'⚔ Идти напролом', next:9},
+    ]
+  },
+  // 7 — духи помогают
+  {
+    loc:1, scene:'forest', type:'success', xp:30, hp:25,
+    text:'Духи откликаются. Белые огоньки окружают тебя — защитный круг. "Путник... кристалл жив... Пещера Эмбера... торопись..." HP +25.',
+    choices:[{text:'🗻 К Горам холода', next:10}]
+  },
+  // 8 — скрытность → лут
+  {
+    loc:1, scene:'forest', type:'loot', gold:20, item:'Зелье маны',
+    text:'Тебе удаётся проскользнуть мимо патрулей. За поворотом — брошенный лагерь. Зелья, монеты, чья-то чужая судьба. +20 золота, Зелье маны.',
+    choices:[{text:'🗻 Продолжить к горам', next:10}]
+  },
+  // 9 — напролом → бой с лесным демоном
+  {
+    loc:1, scene:'forest', type:'combat',
+    text:'Ты ломишься сквозь кусты. Неожиданно. Слишком шумно. Из тьмы выходит Лесной демон — порождение проклятого леса.',
+    choices:[{text:'⚔ Сражаться!', next:'combat:2:10'}]
+  },
+  // 10 — горы
+  {
+    loc:2, scene:'mountains', type:'story',
+    text:'Горы холода. Перевал засыпан снегом. На подходе к крепости стоит Ледяной тролль — огромный, как башня. Он не спит.',
+    choices:[
+      {text:'⚔ Атаковать напрямую', next:'combat:3:11'},
+      {text:'💬 Попытаться говорить', next:12},
+    ]
+  },
+  // 11 — после троля
+  {
+    loc:2, scene:'mountains', type:'success', xp:55, gold:28,
+    text:'Тролль рухнул, сотрясая землю. Дорога через перевал открыта. Вдали виден слабый фиолетовый свет — Пещера Эмбера.',
+    choices:[{text:'💎 К Пещере Эмбера', next:13}]
+  },
+  // 12 — переговоры
+  {
+    loc:2, scene:'mountains', type:'story',
+    text:'Тролль смотрит. Долго. "Тёплый... не тень. Проходи." Тролль отходит в сторону. Странная удача — или это была проверка?',
+    choices:[{text:'💎 К Пещере Эмбера', next:13}]
+  },
+  // 13 — финальный боссс
+  {
+    loc:3, scene:'cave', type:'combat',
+    text:'Пещера Эмбера. Кристалл — огромный, живой, пульсирующий — висит в воздухе. Перед ним Теневой дракон. Страж последнего света. Это конец пути.',
+    choices:[{text:'⚔ ФИНАЛЬНАЯ БИТВА!', next:'combat:5:14'}]
+  },
+  // 14 — победа
+  {
+    loc:3, scene:'cave', type:'win',
+    text:'Дракон повержен. Кристалл медленно опускается к тебе — тёплый, почти живой. Тьма начинает отступать. Ты спас мир. Последняя Искра — в твоих руках.',
+    choices:[{text:'✨ Завершить путь', next:'win'}]
+  },
+];
+
+// ════════════════════════════════════
+//  GAME ENGINE
+// ════════════════════════════════════
+const G = (() => {
+  let state = {};
+  let combat = {};
+  let currentPanel = 'inv';
+
+  // ── INIT ──
+  function init(heroId) {
+    const h = HEROES[heroId];
+    state = {
+      hero: heroId,
+      name: h.name, class: h.role, icon: h.icon, color: h.color,
+      hp: h.hp, maxHp: h.maxHp,
+      mp: h.mp, maxMp: h.maxMp,
+      str: h.str, mag: h.mag, agi: h.agi,
+      special: h.special, specialMp: h.specialMp,
+      gold: 30, xp: 0, turn: 1,
+      locIdx: 0, kills: 0,
+      items: [...h.startItems],
+      visited: [false, false, false, false],
+    };
+    state.visited[0] = true;
+    showScreen('game');
+    navTo('story');
+    showNode(0);
+  }
+
+  // ── SCREENS ──
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('s-' + id).classList.add('active');
+  }
+
+  function navTo(tab) {
+    if (tab === 'story') {
+      showScreen('game');
+      document.getElementById('nav-story').classList.add('active');
+      document.getElementById('nav-panel').classList.remove('active');
+    } else {
+      showScreen('panel');
+      panelTab(currentPanel);
+      document.getElementById('nav-story2').classList.remove('active');
+      document.getElementById('nav-panel2').classList.add('active');
+    }
+  }
+
+  function panelTab(tab) {
+    currentPanel = tab;
+    ['inv','map','stats'].forEach(t => {
+      document.getElementById('tab-'+t).classList.toggle('active', t === tab);
+    });
+    renderPanel(tab);
+  }
+
+  // ── HUD ──
+  function updateHUD() {
+    const s = state;
+    document.getElementById('hud-icon').textContent = s.icon;
+    document.getElementById('bar-hp').style.width = Math.max(0, s.hp/s.maxHp*100) + '%';
+    document.getElementById('bar-mp').style.width = Math.max(0, s.mp/s.maxMp*100) + '%';
+    const xpPct = Math.min(100, (s.xp % 100));
+    document.getElementById('bar-xp').style.width = xpPct + '%';
+    document.getElementById('txt-hp').textContent = s.hp + '/' + s.maxHp;
+    document.getElementById('txt-mp').textContent = s.mp + '/' + s.maxMp;
+    document.getElementById('txt-xp').textContent = s.xp;
+    document.getElementById('hud-gold').textContent = s.gold + ' ◆';
+    document.getElementById('hud-loc').textContent  = LOCATIONS[s.locIdx].name;
+    document.getElementById('hud-turn').textContent = 'Ход ' + s.turn;
+  }
+
+  // ── STORY NODE ──
+  function showNode(idx) {
+    if (idx === 'win') { endGame(true); return; }
+    if (typeof idx === 'string' && idx.startsWith('combat:')) {
+      const [, ei, nxt] = idx.split(':');
+      startCombat(parseInt(ei), parseInt(nxt));
+      return;
+    }
+
+    const node = STORY[idx];
+    if (!node) return;
+
+    state.locIdx = node.loc;
+    state.visited[node.loc] = true;
+    state.turn++;
+
+    // apply effects
+    if (node.gold) { state.gold += node.gold; toast('+' + node.gold + ' золота ◆'); }
+    if (node.hp)   { state.hp = Math.min(state.maxHp, state.hp + node.hp); toast('+' + node.hp + ' HP'); }
+    if (node.xp)   { state.xp += node.xp; toast('+' + node.xp + ' XP'); }
+    if (node.item) { addItem(node.item); toast('Получено: ' + node.item); }
+
+    updateHUD();
+
+    // scene
+    const si = document.getElementById('scene-img');
+    const fade = si.querySelector('.scene-fade');
+    const badge = si.querySelector('.scene-loc-badge');
+    si.innerHTML = SCENES[node.scene] || SCENES.ruins;
+    si.appendChild(fade);
+    si.appendChild(badge);
+    badge.textContent = LOCATIONS[node.loc].name;
+
+    // narrative
+    const nw = document.getElementById('narrative-wrap');
+    nw.innerHTML = '';
+    const box = document.createElement('div');
+    box.className = 'narr-box narr-' + (node.type || 'story');
+    box.textContent = node.text;
+    nw.appendChild(box);
+    nw.scrollTop = 0;
+
+    // choices
+    const cl = document.getElementById('choices-list');
+    cl.innerHTML = '';
+    node.choices.forEach(ch => {
+      const b = document.createElement('button');
+      b.className = 'choice-btn';
+      b.textContent = ch.text;
+      b.onclick = () => showNode(ch.next);
+      cl.appendChild(b);
+    });
+
+    navTo('story');
+  }
+
+  // ── COMBAT ──
+  function startCombat(enemyIdx, nextNode) {
+    const e = ENEMIES[enemyIdx];
+    combat = { enemyIdx, enemyHp: e.hp, maxEnemyHp: e.hp, nextNode, busy: false };
+    document.getElementById('c-hero-ico').textContent   = state.icon;
+    document.getElementById('c-hero-name').textContent  = state.name;
+    document.getElementById('c-enemy-ico').textContent  = e.icon;
+    document.getElementById('c-enemy-name').textContent = e.name;
+    document.getElementById('combat-header').textContent = '⚔ ' + e.name.toUpperCase();
+    updateCombatHUD();
+    const log = document.getElementById('combat-log');
+    log.innerHTML = '';
+    clog('Бой начался!', 'system');
+    updateCombatButtons();
+    showScreen('combat');
+  }
+
+  function updateCombatHUD() {
+    const e = ENEMIES[combat.enemyIdx];
+    document.getElementById('c-hero-hp').textContent = state.hp + '/' + state.maxHp + ' HP';
+    document.getElementById('c-enemy-hp').textContent = combat.enemyHp + '/' + e.hp + ' HP';
+    document.getElementById('c-hero-bar').style.width  = Math.max(0, state.hp/state.maxHp*100) + '%';
+    document.getElementById('c-enemy-bar').style.width = Math.max(0, combat.enemyHp/e.hp*100) + '%';
+    updateHUD();
+  }
+
+  function updateCombatButtons() {
+    document.getElementById('cb-magic').disabled   = state.mp < 12;
+    document.getElementById('cb-special').disabled = state.mp < state.specialMp;
+    const potions = countItem('Зелье здоровья');
+    document.getElementById('cb-potion').disabled  = potions === 0;
+  }
+
+  function clog(msg, cls) {
+    const log = document.getElementById('combat-log');
+    const d = document.createElement('div');
+    d.className = 'cl-' + cls;
+    d.textContent = msg;
+    log.appendChild(d);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function fight(action) {
+    if (combat.busy) return;
+    combat.busy = true;
+    const e = ENEMIES[combat.enemyIdx];
+    let dmg = 0;
+
+    if (action === 'attack') {
+      dmg = Math.max(1, state.str + rnd(8) - 2);
+      if (hasItem('Яд')) { dmg += 20; removeItem('Яд'); clog('☠ Яд нанёс доп. урон!', 'hero'); }
+      clog('⚔ Ты атакуешь — ' + dmg + ' урона', 'hero');
+      combat.enemyHp -= dmg;
+
+    } else if (action === 'magic') {
+      const cost = 12;
+      state.mp = Math.max(0, state.mp - cost);
+      dmg = Math.max(1, state.mag * 2 + rnd(12));
+      clog('✦ Магический удар — ' + dmg + ' урона', 'hero');
+      combat.enemyHp -= dmg;
+
+    } else if (action === 'special') {
+      state.mp = Math.max(0, state.mp - state.specialMp);
+      dmg = Math.max(1, Math.floor((state.str + state.mag) * 1.6 + rnd(16)));
+      clog('★ ' + state.special + ' — ' + dmg + ' урона!', 'hero');
+      combat.enemyHp -= dmg;
+
+    } else if (action === 'potion') {
+      const heal = Math.floor(state.maxHp * 0.35);
+      state.hp = Math.min(state.maxHp, state.hp + heal);
+      removeItem('Зелье здоровья');
+      clog('🧪 Зелье: +' + heal + ' HP', 'system');
+      updateCombatHUD();
+      updateCombatButtons();
+      combat.busy = false;
+      setTimeout(() => enemyTurn(e), 500);
+      return;
+
+    } else if (action === 'flee') {
+      const chance = e.flee + (state.agi / 100);
+      if (Math.random() < chance || hasItem('Дымовая бомба')) {
+        if (hasItem('Дымовая бомба')) removeItem('Дымовая бомба');
+        clog('↩ Побег удался!', 'system');
+        setTimeout(() => { showScreen('game'); showNode(Math.max(0, state.locIdx * 2)); }, 1000);
+      } else {
+        clog('↩ Побег не удался!', 'enemy');
+        setTimeout(() => { combat.busy = false; enemyTurn(e); }, 500);
+      }
+      return;
+    }
+
+    combat.enemyHp = Math.max(0, combat.enemyHp);
+    updateCombatHUD();
+
+    if (combat.enemyHp <= 0) {
+      clog('💀 ' + e.name + ' повержен!', 'win');
+      state.xp += e.xp;
+      state.gold += e.gold;
+      state.kills++;
+      state.mp = Math.min(state.maxMp, state.mp + 15); // restore mana after battle
+      toast('+' + e.xp + ' XP  +' + e.gold + ' ◆');
+      updateHUD();
+      setTimeout(() => { showScreen('game'); showNode(combat.nextNode); }, 1400);
+      return;
+    }
+
+    setTimeout(() => { combat.busy = false; enemyTurn(e); }, 600);
+  }
+
+  function enemyTurn(e) {
+    combat.busy = true;
+    let edm = Math.max(1, e.atk + rnd(8) - 3);
+    if (hasItem('Щит стража')) edm = Math.max(1, edm - 2);
+    state.hp = Math.max(0, state.hp - edm);
+    clog('👹 ' + e.name + ' атакует — ' + edm + ' урона', 'enemy');
+    updateCombatHUD();
+    updateCombatButtons();
+    if (state.hp <= 0) {
+      clog('💀 Ты пал в бою...', 'lose');
+      setTimeout(() => endGame(false), 1300);
+      return;
+    }
+    combat.busy = false;
+  }
+
+  // ── ITEMS ──
+  function addItem(name) {
+    // if already have "×N" version, don't duplicate — just add fresh
+    state.items.push(name);
+  }
+
+  function removeItem(name) {
+    // find and remove one instance (handles both "Зелье здоровья" and "Зелье здоровья ×2")
+    for (let i = 0; i < state.items.length; i++) {
+      if (state.items[i].startsWith(name)) {
+        state.items.splice(i, 1);
+        return;
+      }
+    }
+  }
+
+  function hasItem(name) {
+    return state.items.some(it => it.startsWith(name));
+  }
+
+  function countItem(name) {
+    let c = 0;
+    state.items.forEach(it => {
+      if (it.startsWith(name)) {
+        const m = it.match(/×(\d+)/);
+        c += m ? parseInt(m[1]) : 1;
+      }
+    });
+    return c;
+  }
+
+  // ── PANEL RENDER ──
+  function renderPanel(tab) {
+    const body = document.getElementById('panel-body');
+    body.innerHTML = '';
+
+    if (tab === 'inv') {
+      if (!state.items || state.items.length === 0) {
+        body.innerHTML = '<p style="color:var(--muted);font-style:italic;text-align:center;padding:20px">Инвентарь пуст</p>';
+        return;
+      }
+      state.items.forEach((itemName, idx) => {
+        const base = itemName.replace(/ ×\d+$/, '');
+        const db   = ITEMS_DB[base] || ITEMS_DB[itemName] || {icon:'📦', desc:'Предмет', type:'key'};
+        const div  = document.createElement('div');
+        div.className = 'inv-item';
+        div.innerHTML = `
+          <div class="inv-item-icon">${db.icon}</div>
+          <div class="inv-item-info">
+            <div class="inv-item-name">${itemName}</div>
+            <div class="inv-item-desc">${db.desc}</div>
+          </div>
+          ${(db.type === 'hp' || db.type === 'mp') ? `<button class="inv-use-btn" onclick="G.useItem(${idx})">Использовать</button>` : ''}
+        `;
+        body.appendChild(div);
+      });
+    }
+
+    if (tab === 'map') {
+      LOCATIONS.forEach((loc, i) => {
+        const done    = state.visited[i] && i < state.locIdx;
+        const current = i === state.locIdx;
+        const locked  = !state.visited[i] && i > state.locIdx;
+        const div = document.createElement('div');
+        div.className = 'map-zone';
+        const icons = ['🏚️','🌲','🗻','💎'];
+        const descs = [
+          'Лабиринт теней и призраков. Здесь начинается всё.',
+          'Духи-хранители и шаманы. Опасен, но щедр.',
+          'Крепости и ледяные твари. Путь к финалу.',
+          'Пещера последнего кристалла. Финальная битва.',
+        ];
+        div.innerHTML = `
+          <div class="map-zone-icon">${icons[i]}</div>
+          <div class="map-zone-info">
+            <div class="map-zone-name">${loc.name}</div>
+            <div class="map-zone-desc">${descs[i]}</div>
+            <span class="map-zone-status ${done?'mz-done':current?'mz-current':'mz-locked'}">
+              ${done ? '✓ Пройдено' : current ? '● Здесь' : '🔒 Закрыто'}
+            </span>
+          </div>
+        `;
+        body.appendChild(div);
+      });
+    }
+
+    if (tab === 'stats') {
+      const s = state;
+      body.innerHTML = `
+        <div class="stats-section">
+          <div class="section-title">Персонаж</div>
+          <div class="stat-row2"><span class="sr-label">Имя</span><span class="sr-val">${s.icon} ${s.name}</span></div>
+          <div class="stat-row2"><span class="sr-label">Класс</span><span class="sr-val">${s.class}</span></div>
+          <div class="stat-row2"><span class="sr-label">Уровень</span><span class="sr-val">${Math.floor(s.xp / 100) + 1}</span></div>
+          <div class="stat-row2"><span class="sr-label">Опыт</span><span class="sr-val">${s.xp} XP</span></div>
+        </div>
+        <div class="stats-section">
+          <div class="section-title">Характеристики</div>
+          <div class="stat-row2"><span class="sr-label">HP</span><span class="sr-val">${s.hp} / ${s.maxHp}</span></div>
+          <div class="stat-row2"><span class="sr-label">MP</span><span class="sr-val">${s.mp} / ${s.maxMp}</span></div>
+          <div class="stat-row2"><span class="sr-label">Сила</span><span class="sr-val">${s.str}</span></div>
+          <div class="stat-row2"><span class="sr-label">Магия</span><span class="sr-val">${s.mag}</span></div>
+          <div class="stat-row2"><span class="sr-label">Ловкость</span><span class="sr-val">${s.agi}</span></div>
+        </div>
+        <div class="stats-section">
+          <div class="section-title">Прогресс</div>
+          <div class="stat-row2"><span class="sr-label">Золото</span><span class="sr-val" style="color:var(--gold)">${s.gold} ◆</span></div>
+          <div class="stat-row2"><span class="sr-label">Убито врагов</span><span class="sr-val">${s.kills}</span></div>
+          <div class="stat-row2"><span class="sr-label">Ходов</span><span class="sr-val">${s.turn}</span></div>
+          <div class="stat-row2"><span class="sr-label">Локация</span><span class="sr-val">${LOCATIONS[s.locIdx].region}</span></div>
+          <div class="stat-row2"><span class="sr-label">Спецприём</span><span class="sr-val">${s.special}</span></div>
+        </div>
+      `;
+    }
+  }
+
+  function useItem(idx) {
+    const itemName = state.items[idx];
+    if (!itemName) return;
+    const base = itemName.replace(/ ×\d+$/, '');
+    const db   = ITEMS_DB[base] || ITEMS_DB[itemName];
+    if (!db) return;
+    if (db.type === 'hp') {
+      const heal = Math.floor(state.maxHp * db.val);
+      state.hp = Math.min(state.maxHp, state.hp + heal);
+      state.items.splice(idx, 1);
+      toast('+' + heal + ' HP');
+      updateHUD();
+    } else if (db.type === 'mp') {
+      state.mp = Math.min(state.maxMp, state.mp + db.val);
+      state.items.splice(idx, 1);
+      toast('+' + db.val + ' MP');
+      updateHUD();
+    }
+    panelTab('inv');
+  }
+
+  // ── END ──
+  function endGame(win) {
+    document.getElementById('end-emblem').textContent = win ? '💎' : '💀';
+    document.getElementById('end-title').textContent  = win ? 'Последняя Искра спасена!' : 'Тьма победила';
+    document.getElementById('end-desc').textContent   = win
+      ? 'Ты нашёл кристалл Эмбера. Вечные Тени отступили. Мир будет помнить твоё имя.'
+      : 'Тени сомкнулись. Кристалл угас. Но тьма не вечна — попробуй снова.';
+    document.getElementById('e-turns').textContent = state.turn;
+    document.getElementById('e-kills').textContent = state.kills;
+    document.getElementById('e-xp').textContent    = state.xp;
+    showScreen('end');
+    // tell bot about result
+    if (twa) twa.sendData(JSON.stringify({ result: win ? 'win' : 'lose', turns: state.turn, kills: state.kills, xp: state.xp }));
+  }
+
+  function restart() { showScreen('title'); }
+
+  // ── HELPERS ──
+  function rnd(n) { return Math.floor(Math.random() * n); }
+
+  function toast(msg) {
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2000);
+  }
+
+  // ── HEROES RENDER ──
+  function renderHeroes() {
+    const list = document.getElementById('heroes-list');
+    list.innerHTML = '';
+    Object.values(HEROES).forEach(h => {
+      const card = document.createElement('div');
+      card.className = 'hero-card';
+      card.style.setProperty('--hc', h.color);
+      card.style.setProperty('--hcr', h.colorR);
+      card.innerHTML = `
+        <div class="hcard-top">
+          <div class="hcard-icon">${h.icon}</div>
+          <div class="hcard-info">
+            <div class="hcard-name" style="color:${h.color}">${h.name}</div>
+            <div class="hcard-role">${h.role}</div>
+          </div>
+        </div>
+        <div class="hcard-desc">${h.desc}</div>
+        <div class="stats-grid">
+          <div class="stat-pill"><div class="stat-pill-val" style="color:${h.color}">${h.str}</div><div class="stat-pill-lbl">Сила</div></div>
+          <div class="stat-pill"><div class="stat-pill-val" style="color:${h.color}">${h.mag}</div><div class="stat-pill-lbl">Магия</div></div>
+          <div class="stat-pill"><div class="stat-pill-val" style="color:${h.color}">${h.agi}</div><div class="stat-pill-lbl">Ловкость</div></div>
+        </div>
+        <div class="skills-row">
+          ${h.skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}
+        </div>
+        <button class="hero-select-btn" onclick="G.init('${h.id}')">Выбрать ${h.name} →</button>
+      `;
+      list.appendChild(card);
+    });
+  }
+
+  // expose
+  return { showScreen, navTo, panelTab, init, showNode, fight, useItem, restart, renderHeroes };
+})();
+
+// init heroes on load
+G.renderHeroes();
+</script>
+</body>
+</html>
