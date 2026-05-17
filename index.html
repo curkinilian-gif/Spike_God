@@ -1044,7 +1044,7 @@ function secretClick(type){
 let D=load();
 let cart=[];
 let currentFilter='all';
-let editProdId=null,editFaqId=null,currentPhoto=null;
+let editProdId=null,editFaqId=null,currentPhoto=null,photoUploadDone=false;
 let uid=()=>Date.now()+Math.floor(Math.random()*9999);
 
 // ── JSONBIN SYNC ──
@@ -1414,6 +1414,7 @@ function handlePhoto(input){
   const file=input.files[0];if(!file)return;
   if(file.size>5*1024*1024){toast('⚠️ '+t('toast_big_file'));return;}
   const reader=new FileReader();
+  photoUploadDone = false;
   reader.onload=e=>{
     const img=new Image();
     img.onload=async function(){
@@ -1432,6 +1433,7 @@ function handlePhoto(input){
       // Потом загружаем в облако и обновляем ссылку
       const cloudUrl = await uploadToImgBB(compressed);
       if(cloudUrl !== compressed) setPhotoPreview(cloudUrl);
+      photoUploadDone = true;
     };
     img.src=e.target.result;
   };
@@ -1456,10 +1458,19 @@ function resetPhoto(){
   document.getElementById('pf-photo-input').value='';
 }
 function clearPhoto(e){e.stopPropagation();resetPhoto();}
-function saveProduct(){
+async function saveProduct(){
   const name=document.getElementById('pf-name').value.trim();
   const price=parseFloat(document.getElementById('pf-price').value);
   if(!name||!price){toast('⚠️ '+t('toast_fill_prod'));return;}
+  // Ждём загрузки фото на ImgBB если она ещё идёт
+  if(currentPhoto && currentPhoto.startsWith('data:') && !photoUploadDone){
+    toast('⏳ Подождите, фото ещё загружается...');
+    let attempts=0;
+    while(currentPhoto && currentPhoto.startsWith('data:') && attempts<30){
+      await new Promise(r=>setTimeout(r,500));
+      attempts++;
+    }
+  }
   const existingProd=editProdId?D.products.find(x=>x.id===editProdId):null;
   const p={id:editProdId||uid(),name,price,game:document.getElementById('pf-game').value,oldPrice:parseFloat(document.getElementById('pf-oldprice').value)||null,emoji:document.getElementById('pf-emoji').value.trim()||'🎮',badge:document.getElementById('pf-badge').value||null,desc:document.getElementById('pf-desc').value.trim(),desc_en:document.getElementById('pf-desc-en').value.trim(),desc_kz:document.getElementById('pf-desc-kz').value.trim(),photo:currentPhoto||null,inStock:existingProd?existingProd.inStock!==false:true};
   if(editProdId){const i=D.products.findIndex(x=>x.id===editProdId);if(i>=0)D.products[i]=p;else D.products.push(p);}
