@@ -1060,12 +1060,12 @@ async function sheetsGet() {
     const json = await r.json();
     const products = json.record && json.record.products;
     if (Array.isArray(products) && products.length > 0) {
-      // Сохраняем локальные фотографии — они не хранятся в облаке
+      // Если в JSONBin есть ссылка ImgBB — берём её, иначе берём локальную
       const localPhotos = {};
       D.products.forEach(p => { if(p.photo) localPhotos[p.id] = p.photo; });
       D.products = products.map(p => ({
         ...p,
-        photo: localPhotos[p.id] || p.photo || null
+        photo: p.photo || (localPhotos[p.id] && localPhotos[p.id].startsWith('http') ? localPhotos[p.id] : null)
       }));
       save();
       renderProducts();
