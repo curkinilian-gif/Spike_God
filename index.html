@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:;">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spike_shop</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#7c3aed;
+  --accent2:#6d28d9;
+  --glow:rgba(124,58,237,.35);
+  --bg:#08080f;
+  --bg2:#0f0f1a;
+  --bg3:#161625;
+  --border:rgba(255,255,255,.06);
+  --border2:rgba(124,58,237,.2);
+  --text:#f1f0ff;
+  --muted:#666680;
+  --gold:#e8c840;
+  --rb:#f43f5e; --bs:#8b5cf6; --cr:#0ea5e9; --coc:#22c55e;
+}
+html{scroll-behavior:smooth;overflow-x:hidden;max-width:100%}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;max-width:100%;position:relative}
+nav,main,.hero,section,footer,.modal-overlay,.cart-overlay,.admin-overlay,.toast{position:relative;z-index:1}
+#particles-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:1}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--accent2);border-radius:99px}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:100;background:rgba(8,8,15,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 1rem;display:flex;align-items:center;height:56px;gap:8px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+nav::-webkit-scrollbar{display:none}
+.nav-logo{font-family:'Syne',sans-serif;font-size:1.45rem;font-weight:800;color:var(--text);text-decoration:none;white-space:nowrap;cursor:pointer;letter-spacing:-0.5px}
+.nav-logo span{color:var(--accent)}
+.nav-links{display:flex;gap:2px;margin-left:1.2rem;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;padding:6px 12px;border-radius:8px;transition:all .2s}
+.nav-links a:hover{color:var(--text);background:rgba(255,255,255,.05)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.nav-search{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:7px 14px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;width:180px;outline:none;transition:border-color .2s,width .3s}
+.nav-search:focus{border-color:var(--accent);width:220px}
+.nav-search::placeholder{color:#3a3a55}
+
+/* Currency & Language selectors */
+.nav-select{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:7px 10px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;cursor:pointer;outline:none;transition:border-color .2s}
+.nav-select:hover{border-color:var(--border2)}
+.nav-select option{background:#0f0f1a;color:var(--text)}
+
+.cart-btn{background:var(--accent);border:none;border-radius:10px;padding:8px 16px;color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .2s;box-shadow:0 0 20px var(--glow);flex-shrink:0}
+.cart-btn:hover{background:var(--accent2)}
+.cart-badge{background:rgba(0,0,0,.35);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.admin-nav-btn{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:7px 14px;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.admin-nav-btn:hover{color:var(--text);border-color:var(--border2)}
+
+/* ── HERO ── */
+.hero{position:relative;overflow:hidden;padding:5.5rem 2rem 4rem;text-align:center;z-index:3}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(124,58,237,.18) 0%,transparent 70%);pointer-events:none}
+.hero-grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(124,58,237,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;mask-image:radial-gradient(ellipse at 50% 0%,black 30%,transparent 80%)}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.25);border-radius:50px;padding:5px 14px;font-size:12px;font-weight:600;color:#a78bfa;letter-spacing:.5px;margin-bottom:1.5rem;position:relative}
+.hero-dot{width:6px;height:6px;border-radius:50%;background:#a78bfa;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.hero-title{font-family:'Syne',sans-serif;font-size:clamp(2.2rem,5.5vw,4.5rem);line-height:1.08;letter-spacing:-1.5px;margin-bottom:1.2rem;position:relative;color:var(--text)}
+.hero-title em{font-style:normal;color:var(--accent)}
+.hero-sub{font-size:1rem;color:var(--muted);max-width:500px;margin:0 auto 2rem;line-height:1.7;position:relative}
+.hero-cta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;position:relative}
+.btn-primary{background:var(--accent);border:none;border-radius:10px;padding:13px 28px;color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;display:inline-block;transition:all .2s;box-shadow:0 0 28px var(--glow)}
+.btn-primary:hover{background:var(--accent2);transform:translateY(-2px)}
+.btn-outline{background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:13px 28px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;display:inline-block;transition:all .2s}
+.btn-outline:hover{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.04)}
+.hero-stats{display:flex;justify-content:center;gap:3rem;margin-top:4rem;padding-top:2.5rem;border-top:1px solid var(--border);flex-wrap:wrap;position:relative}
+.stat-item{text-align:center}
+.stat-num{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--text)}
+.stat-label{font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:3px}
+
+/* ── TABS ── */
+.game-tabs-wrap{background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:62px;z-index:90}
+.game-tabs{display:flex;max-width:1200px;margin:0 auto;padding:0 1.5rem;overflow-x:auto;scrollbar-width:none}
+.game-tabs::-webkit-scrollbar{display:none}
+.game-tab{padding:14px 20px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.game-tab:hover{color:#ccc}
+.game-tab.active{color:var(--text);border-color:var(--accent)}
+.tab-icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff}
+
+/* ── SHOP ── */
+#shop{max-width:1200px;margin:0 auto;padding:2.5rem 1.5rem}
+.shop-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:12px}
+.shop-title{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:-.5px}
+.shop-meta{display:flex;align-items:center;gap:10px}
+.items-count{font-size:13px;color:var(--muted);background:rgba(255,255,255,.04);border-radius:8px;padding:4px 12px}
+.sort-select{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;outline:none}
+.sort-select option{background:#0f0f1a}
+
+/* ── PRODUCT CARDS ── */
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:14px;align-items:start}
+.product-card{background:var(--bg2);border-radius:14px;overflow:hidden;border:1px solid var(--border);transition:transform .25s,border-color .25s,box-shadow .25s;display:flex;flex-direction:column}
+.product-card:hover{transform:translateY(-5px);border-color:var(--border2);box-shadow:0 16px 40px rgba(0,0,0,.5),0 0 0 1px rgba(124,58,237,.1)}
+.product-img{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:3.2rem;position:relative;overflow:hidden}
+.product-img.has-photo{font-size:0}
+.product-img.has-photo img{width:100%;height:100%;object-fit:cover}
+.badge{position:absolute;top:10px;right:10px;font-size:10px;font-weight:700;border-radius:6px;padding:3px 8px;z-index:2;letter-spacing:.3px}
+.badge-hot {background:rgba(244,63,94,.15);border:1px solid rgba(244,63,94,.3);color:#fda4af}
+.badge-sale{background:rgba(232,200,64,.12);border:1px solid rgba(232,200,64,.3);color:#fde68a}
+.badge-new {background:rgba(14,165,233,.12);border:1px solid rgba(14,165,233,.3);color:#7dd3fc}
+.product-body{padding:12px 14px 14px;flex:1;display:flex;flex-direction:column}
+.game-tag{font-size:10px;font-weight:600;border-radius:5px;padding:2px 8px;display:inline-block;margin-bottom:7px;letter-spacing:.3px}
+.tag-rb {background:rgba(244,63,94,.12);color:#fda4af}
+.tag-bs {background:rgba(139,92,246,.12);color:#c4b5fd}
+.tag-cr {background:rgba(14,165,233,.12);color:#7dd3fc}
+.tag-coc{background:rgba(34,197,94,.12);color:#86efac}
+.product-name{font-size:14px;font-weight:600;margin-bottom:3px;line-height:1.35;flex:1}
+.product-desc{font-size:11px;color:var(--muted);line-height:1.4;max-height:0;overflow:hidden;transition:max-height .3s ease,margin .3s ease;margin-bottom:0}
+.product-desc.expanded{max-height:200px;margin-bottom:10px}
+.desc-toggle{background:none;border:none;color:var(--accent);font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;cursor:pointer;padding:0;margin-bottom:8px;display:flex;align-items:center;gap:3px;letter-spacing:.3px;opacity:.85;transition:opacity .2s}
+.desc-toggle:hover{opacity:1}
+.desc-toggle-arrow{display:inline-block;transition:transform .3s;font-size:9px}
+.desc-toggle.open .desc-toggle-arrow{transform:rotate(180deg)}
+.product-footer{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.price-wrap{}
+.product-price{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:700;color:var(--gold)}
+.old-price{font-size:11px;color:#444;text-decoration:line-through}
+.add-btn{background:var(--accent);border:none;border-radius:8px;color:#fff;font-size:18px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;flex-shrink:0;transition:all .15s;box-shadow:0 0 14px var(--glow)}
+.add-btn:hover{background:var(--accent2);transform:scale(1.12)}
+.add-btn:active{transform:scale(.93)}
+.add-btn:disabled{background:#2a2a3a;box-shadow:none;cursor:not-allowed;opacity:.5;transform:none}
+.add-btn:disabled:hover{background:#2a2a3a;transform:none}
+.out-of-stock-badge{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);border:1px solid rgba(255,255,255,.15);border-radius:6px;font-size:10px;font-weight:700;color:#f87171;padding:3px 10px;white-space:nowrap;z-index:3;letter-spacing:.3px}
+.product-card.oos{opacity:.75}
+.product-card.oos .product-img::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,.35)}
+
+/* ── HOW ── */
+#how{max-width:900px;margin:0 auto;padding:4rem 1.5rem;text-align:center}
+.section-heading{font-family:'Syne',sans-serif;font-size:clamp(1.7rem,4vw,2.3rem);font-weight:800;letter-spacing:-.5px;margin-bottom:.5rem}
+.section-sub{color:var(--muted);font-size:14px;margin-bottom:3rem}
+.steps{display:flex;justify-content:center;flex-wrap:wrap}
+.step{flex:1;min-width:140px;padding:24px 14px}
+.step-num{width:44px;height:44px;border-radius:12px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.25);color:#a78bfa;font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.step-title{font-weight:700;font-size:14px;margin-bottom:5px}
+.step-desc{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* ── FAQ ── */
+#faq{max-width:760px;margin:0 auto;padding:3rem 1.5rem 4rem}
+.faq-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden}
+.faq-q{padding:16px 18px;font-weight:600;font-size:14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:background .2s}
+.faq-q:hover{background:rgba(255,255,255,.02)}
+.faq-arrow{font-size:14px;transition:transform .3s;color:var(--muted)}
+.faq-item.open .faq-arrow{transform:rotate(180deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.faq-item.open .faq-a{max-height:200px}
+.faq-a-inner{padding:0 18px 16px;font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── FOOTER ── */
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:2.5rem 1.5rem 2rem;text-align:center}
+.footer-logo{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;display:block;margin-bottom:8px;color:var(--text)}
+.footer-logo span{color:var(--accent)}
+footer p{font-size:13px;color:var(--muted);margin-bottom:6px}
+footer a{color:var(--muted);text-decoration:none;margin:0 8px;font-size:13px;transition:color .2s}
+footer a:hover{color:var(--text)}
+.footer-bottom{margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border);font-size:12px;color:#333}
+
+/* ── CART ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.cart-panel{background:var(--bg2);border-top:1px solid var(--border2);border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:80vh;overflow-y:auto;padding:1.5rem;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1)}
+.modal-overlay.open .cart-panel{transform:translateY(0)}
+.panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.panel-title{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800}
+.close-btn{background:rgba(255,255,255,.07);border:none;border-radius:8px;width:32px;height:32px;color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.close-btn:hover{background:rgba(255,255,255,.13)}
+.cart-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.ci-thumb{width:42px;height:42px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;overflow:hidden}
+.ci-thumb img{width:100%;height:100%;object-fit:cover}
+.ci-info{flex:1}
+.ci-name{font-weight:600;font-size:14px}
+.ci-price{font-size:13px;color:var(--gold);font-weight:700}
+.ci-remove{background:none;border:none;color:#444;cursor:pointer;font-size:17px;padding:4px;transition:color .2s}
+.ci-remove:hover{color:var(--rb)}
+.cart-empty{text-align:center;padding:2rem;color:var(--muted);font-size:14px}
+.cart-total-row{display:flex;justify-content:space-between;align-items:center;padding:1rem 0;font-weight:700;font-size:15px;border-top:1px solid var(--border);margin-top:.5rem}
+.cart-total-price{font-family:'Syne',sans-serif;font-size:1.4rem;color:var(--gold)}
+.checkout-btn{width:100%;background:var(--accent);border:none;border-radius:12px;padding:15px;color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:12px;box-shadow:0 0 20px var(--glow);transition:background .2s}
+.checkout-btn:hover{background:var(--accent2)}
+
+/* ── BIG MODALS ── */
+.big-modal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:400;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .3s}
+.big-modal.open{opacity:1;pointer-events:all}
+.modal-box{background:var(--bg2);border-radius:18px;border:1px solid var(--border2);padding:2rem;width:100%;max-width:440px;transform:scale(.92);transition:transform .3s;max-height:90vh;overflow-y:auto}
+.big-modal.open .modal-box{transform:scale(1)}
+.modal-title{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:1.2rem}
+.form-group{margin-bottom:13px}
+.form-group label{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px 13px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;transition:border-color .2s;resize:vertical}
+.form-group input:focus,.form-group select:focus{border-color:var(--accent)}
+.form-group input::placeholder{color:#333}
+.form-group select option{background:#0f0f1a}
+.pay-btn{width:100%;background:var(--accent);border:none;border-radius:10px;padding:13px;color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-top:14px;box-shadow:0 0 20px var(--glow)}
+.order-summary-box{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:11px 13px;margin-top:4px;font-size:13px;color:var(--muted)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:11px 22px;border-radius:50px;font-size:14px;font-weight:600;transition:transform .3s;z-index:500;white-space:normal;max-width:calc(100vw - 2rem);text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ═══════════ ADMIN ═══════════ */
+.admin-login{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:700;display:none;align-items:center;justify-content:center}
+.admin-login.show{display:flex}
+.admin-login-box{background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:2.5rem;width:100%;max-width:340px;text-align:center}
+.admin-login-icon{font-size:2.5rem;margin-bottom:1rem;display:block}
+.admin-login-title{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:.4rem}
+.admin-login-sub{color:var(--muted);font-size:13px;margin-bottom:1.4rem}
+.admin-login-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:15px;outline:none;text-align:center;letter-spacing:3px;margin-bottom:12px;transition:border-color .2s}
+.admin-login-input:focus{border-color:var(--accent)}
+.admin-login-btn{width:100%;background:var(--accent);border:none;border-radius:10px;padding:12px;color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 0 20px var(--glow)}
+.admin-hint{font-size:11px;color:#333;margin-top:.75rem}
+.admin-cancel{background:none;border:none;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;margin-top:.5rem;display:block;width:100%}
+
+.admin-overlay{position:fixed;inset:0;background:var(--bg);z-index:600;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .3s}
+.admin-overlay.open{opacity:1;pointer-events:all}
+.admin-bar{background:#060610;border-bottom:1px solid var(--border2);padding:0 1.5rem;height:52px;display:flex;align-items:center;gap:1rem;flex-shrink:0}
+.admin-logo{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--accent)}
+.admin-tabs{display:flex;gap:4px;margin-left:.5rem;overflow-x:auto;scrollbar-width:none}
+.admin-tabs::-webkit-scrollbar{display:none}
+.a-tab{background:transparent;border:1px solid transparent;border-radius:8px;padding:6px 12px;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s}
+.a-tab:hover{color:var(--text)}
+.a-tab.active{background:rgba(124,58,237,.12);border-color:rgba(124,58,237,.25);color:#a78bfa}
+.admin-close{margin-left:auto;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;padding:6px 14px;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.admin-close:hover{color:var(--text)}
+.admin-body{flex:1;overflow-y:auto;padding:2rem 1.5rem}
+.admin-inner{max-width:900px;margin:0 auto}
+.a-section{display:none}
+.a-section.active{display:block}
+.a-title{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:.3rem}
+.a-sub{color:var(--muted);font-size:13px;margin-bottom:1.5rem}
+
+.prod-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem}
+.prod-row{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 15px;display:flex;align-items:center;gap:13px}
+.prod-thumb{width:48px;height:48px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:1.7rem;flex-shrink:0;overflow:hidden}
+.prod-thumb img{width:100%;height:100%;object-fit:cover}
+.prod-info{flex:1;min-width:0}
+.prod-name{font-weight:700;font-size:14px;margin-bottom:2px}
+.prod-meta{font-size:12px;color:var(--muted)}
+.prod-actions{display:flex;gap:7px;flex-shrink:0}
+.btn-edit{background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);border-radius:7px;padding:5px 12px;color:#7dd3fc;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
+.btn-del {background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.2);border-radius:7px;padding:5px 12px;color:#fda4af;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
+.btn-add-prod{background:var(--accent);border:none;border-radius:10px;padding:11px 22px;color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 0 16px var(--glow)}
+
+.prod-form{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:1.4rem;margin-top:1rem;display:none}
+.prod-form-title{font-weight:700;font-size:15px;margin-bottom:1.2rem}
+.pf-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.pf-field{display:flex;flex-direction:column;gap:5px}
+.pf-field.full{grid-column:1/-1}
+.pf-field label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.pf-field input,.pf-field select,.pf-field textarea{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:9px;padding:9px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;resize:vertical;transition:border-color .2s}
+.pf-field input:focus,.pf-field select:focus,.pf-field textarea:focus{border-color:var(--accent)}
+.pf-field input::placeholder,.pf-field textarea::placeholder{color:#333}
+.pf-field select option{background:#0f0f1a}
+
+.photo-zone{border:2px dashed rgba(124,58,237,.2);border-radius:12px;padding:1.5rem;text-align:center;cursor:pointer;transition:all .2s;position:relative;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px}
+.photo-zone:hover{border-color:rgba(124,58,237,.5);background:rgba(124,58,237,.04)}
+.photo-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.photo-zone.filled{border-style:solid;border-color:rgba(124,58,237,.4);padding:.75rem}
+.photo-preview-img{width:100%;max-height:140px;object-fit:cover;border-radius:8px;display:none}
+.photo-zone-text{color:var(--muted);font-size:13px;pointer-events:none}
+.photo-zone-icon{font-size:1.8rem;pointer-events:none}
+.btn-clear-photo{background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.2);border-radius:6px;padding:4px 12px;color:#fda4af;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:none;z-index:2;position:relative;margin-top:6px}
+
+.pf-actions{display:flex;gap:10px}
+.btn-pf-save{background:var(--accent);border:none;border-radius:9px;padding:10px 22px;color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 0 14px var(--glow)}
+.btn-pf-cancel{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:9px;padding:10px 18px;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;cursor:pointer}
+
+.s-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.s-field{display:flex;flex-direction:column;gap:5px}
+.s-field.full{grid-column:1/-1}
+.s-field label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.s-field input,.s-field select{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px 13px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+.s-field input:focus{border-color:var(--accent)}
+.s-divider{grid-column:1/-1;height:1px;background:var(--border)}
+.btn-save-settings{background:var(--accent);border:none;border-radius:10px;padding:11px 26px;color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-top:1.2rem;box-shadow:0 0 14px var(--glow)}
+
+.faq-admin-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem}
+.faq-row{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:12px}
+.faq-row-texts{flex:1}
+.faq-row-q{font-weight:600;font-size:13px;margin-bottom:3px}
+.faq-row-a{font-size:12px;color:var(--muted)}
+.faq-row-actions{display:flex;gap:7px;flex-shrink:0}
+
+.orders-list{display:flex;flex-direction:column;gap:10px}
+.order-row{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:13px 15px}
+.order-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;flex-wrap:wrap;gap:8px}
+.order-id{font-weight:700;font-size:14px}
+.order-details{font-size:13px;color:#aaa;line-height:1.7}
+.order-status{font-size:11px;font-weight:600;border-radius:6px;padding:3px 9px}
+.status-new{background:rgba(124,58,237,.12);color:#a78bfa}
+.status-done{background:rgba(34,197,94,.1);color:#86efac}
+.no-orders{text-align:center;padding:3rem;color:var(--muted);font-size:14px}
+
+.faq-form{background:var(--bg2);border:1px solid var(--border2);border-radius:13px;padding:1.2rem;display:none;margin-bottom:1rem}
+.faq-form-fields{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.faq-form-fields label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px}
+.faq-form-fields input,.faq-form-fields textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:9px;padding:9px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;resize:vertical}
+.faq-form-fields input:focus,.faq-form-fields textarea:focus{border-color:var(--accent)}
+
+/* ══════════════════════════════
+   RESPONSIVE — ALL DEVICES
+══════════════════════════════ */
+
+/* Tablet landscape: 1024px */
+@media(max-width:1024px){
+  .products-grid{grid-template-columns:repeat(3,1fr)}
+  #shop{padding:2rem 1rem}
+}
+
+/* Tablet portrait: 768px */
+@media(max-width:768px){
+  /* Nav */
+  .nav-links{display:none}
+  .nav-search{width:110px;flex-shrink:0}
+  .nav-logo{flex-shrink:0}
+  .nav-select{flex-shrink:0}
+  .cart-btn{flex-shrink:0}
+  .admin-nav-btn{flex-shrink:0}
+
+  /* Hero */
+  .hero{padding:3.5rem 1.2rem 3rem}
+  .hero-stats{gap:2rem}
+
+  /* Shop */
+  #shop{padding:1.5rem 1rem}
+  .products-grid{grid-template-columns:repeat(3,1fr);gap:12px}
+
+  /* How */
+  #how{padding:2.5rem 1rem}
+  .steps{gap:0}
+  .step{min-width:120px;padding:16px 10px}
+
+  /* FAQ */
+  #faq{padding:2rem 1rem 3rem}
+
+  /* Admin */
+  .s-grid,.pf-grid{grid-template-columns:1fr}
+  .pf-field.full,.s-field.full{grid-column:auto}
+
+  /* Modals */
+  .modal-box{padding:1.5rem}
+}
+
+/* Mobile large: 480px */
+@media(max-width:480px){
+  /* Nav — scrollable, all items kept */
+  nav{padding:0 .8rem;gap:6px;height:52px}
+  .nav-links{display:none}
+  .nav-logo{font-size:1.1rem;flex-shrink:0}
+  .nav-select{padding:6px 7px;font-size:11px;flex-shrink:0}
+  .nav-search{display:none}
+  .admin-nav-btn{padding:6px 9px;font-size:12px;flex-shrink:0}
+  .cart-btn{padding:7px 11px;font-size:12px;flex-shrink:0}
+  .cart-btn #cart-label{display:none}
+
+  /* Sticky tabs offset */
+  .game-tabs-wrap{top:52px}
+
+  /* Hero */
+  .hero{padding:2.5rem .9rem 2.2rem}
+  .hero-title{font-size:2rem;letter-spacing:-1px}
+  .hero-sub{font-size:.9rem}
+  .btn-primary,.btn-outline{padding:11px 20px;font-size:13px}
+  .hero-stats{gap:1.5rem;margin-top:2.5rem;padding-top:1.8rem}
+  .stat-num{font-size:1.5rem}
+  .stat-label{font-size:10px}
+
+  /* Tabs */
+  .game-tab{padding:12px 13px;font-size:12px}
+
+  /* Shop */
+  #shop{padding:1.2rem .9rem}
+  .shop-title{font-size:1.15rem}
+  .products-grid{grid-template-columns:repeat(2,1fr);gap:9px}
+  .product-name{font-size:12px}
+  .product-desc{font-size:10px}
+  .product-price{font-size:1rem}
+  .add-btn{width:28px;height:28px;font-size:16px}
+
+  /* How */
+  #how{padding:2rem .9rem}
+  .section-heading{font-size:1.5rem}
+  .steps{flex-direction:column;align-items:center}
+  .step{width:100%;max-width:300px;padding:14px 16px;display:flex;align-items:flex-start;gap:14px;text-align:left}
+  .step-num{margin:0;flex-shrink:0;width:38px;height:38px;font-size:1rem}
+
+  /* FAQ */
+  #faq{padding:1.5rem .9rem 2.5rem}
+  .faq-q{padding:14px 15px;font-size:13px}
+
+  /* Footer */
+  footer{padding:2rem .9rem 1.5rem}
+
+  /* Cart panel */
+  .cart-panel{padding:1.2rem}
+  .panel-title{font-size:1.1rem}
+
+  /* Checkout modal */
+  .modal-box{padding:1.2rem;border-radius:14px;max-height:95vh}
+  .modal-title{font-size:1.2rem}
+  .form-group input,.form-group select{padding:9px 11px;font-size:13px}
+
+  /* Admin */
+  .admin-bar{padding:0 .8rem;height:48px;gap:6px}
+  .admin-logo{font-size:1rem}
+  .a-tab{padding:5px 9px;font-size:11px}
+  .admin-close{padding:5px 10px;font-size:12px}
+  .admin-body{padding:1.2rem .9rem}
+  .prod-row{flex-wrap:wrap}
+  .prod-actions{width:100%;justify-content:flex-end}
+
+  /* Admin login */
+  .admin-login-box{padding:1.8rem 1.3rem;margin:1rem}
+}
+
+/* Mobile small: 360px */
+@media(max-width:360px){
+  .products-grid{grid-template-columns:repeat(2,1fr);gap:7px}
+  .hero-title{font-size:1.75rem}
+  .hero-cta{flex-direction:column;align-items:center}
+  .btn-primary,.btn-outline{width:100%;text-align:center}
+  .nav-select{font-size:11px;padding:5px 6px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-logo" id="nav-logo" onclick="secretClick('logo')">Spike<span>_shop</span></span>
+  <ul class="nav-links">
+    <li><a href="#shop" data-i18n="nav_shop">Магазин</a></li>
+    <li><a href="#how" data-i18n="nav_how">Как купить</a></li>
+    <li><a href="#faq">FAQ</a></li>
+  </ul>
+  <div class="nav-right">
+    <input class="nav-search" id="nav-search" type="text" placeholder="🔍 Поиск..." oninput="renderProducts()">
+
+    <!-- CURRENCY -->
+    <select class="nav-select" id="currency-select" onchange="changeCurrency(this.value)" title="Валюта">
+      <option value="RUB">₽ RUB</option>
+      <option value="USD">$ USD</option>
+      <option value="EUR">€ EUR</option>
+      <option value="KZT">₸ KZT</option>
+      <option value="UAH">₴ UAH</option>
+    </select>
+
+    <!-- LANGUAGE -->
+    <select class="nav-select" id="lang-select" onchange="changeLang(this.value)" title="Язык">
+      <option value="ru">🇷🇺 RU</option>
+      <option value="en">🇬🇧 EN</option>
+      <option value="kz">🇰🇿 KZ</option>
+    </select>
+
+    <button class="cart-btn" onclick="openCart()">
+      🛒 <span id="cart-label" data-i18n="nav_cart">Корзина</span>
+      <div class="cart-badge" id="cart-count">0</div>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-grid-bg"></div>
+  <h1 class="hero-title" data-i18n="hero_title">Всё для твоих<br><em>любимых игр</em></h1>
+  <p class="hero-sub" id="el-sub" data-i18n="hero_sub">Roblox, Brawl Stars, Clash Royale, Clash of Clans — покупай валюту, пропуски и предметы быстро и выгодно.</p>
+  <div class="hero-cta">
+    <a href="#shop" class="btn-primary" data-i18n="hero_btn1">🛍️ В магазин</a>
+    <a href="#how" class="btn-outline" data-i18n="hero_btn2">Как это работает?</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-item"><div class="stat-num" id="el-stat2">4</div><div class="stat-label" data-i18n="stat_games">Игры</div></div>
+    <div class="stat-item"><div class="stat-num" id="el-stat3">5–15 мин</div><div class="stat-label" data-i18n="stat_delivery">Доставка</div></div>
+  </div>
+</section>
+
+<!-- TABS -->
+<div class="game-tabs-wrap">
+  <div class="game-tabs">
+    <div class="game-tab active" data-game="all" onclick="setFilter('all',this)" data-i18n="tab_all">🎮 Все</div>
+    <div class="game-tab" data-game="rb"  onclick="setFilter('rb',this);secretClick('rb')"><div class="tab-icon" style="background:#f43f5e">R</div>Roblox</div>
+    <div class="game-tab" data-game="bs"  onclick="setFilter('bs',this);secretClick('bs')"><div class="tab-icon" style="background:#8b5cf6">B</div>Brawl Stars</div>
+    <div class="game-tab" data-game="cr"  onclick="setFilter('cr',this);secretClick('cr')"><div class="tab-icon" style="background:#0ea5e9">CR</div>Clash Royale</div>
+    <div class="game-tab" data-game="coc" onclick="setFilter('coc',this);secretClick('coc')"><div class="tab-icon" style="background:#22c55e">CoC</div>Clash of Clans</div>
+  </div>
+</div>
+
+<!-- SHOP -->
+<section id="shop">
+  <div class="shop-header">
+    <div class="shop-title" id="shop-title" data-i18n="shop_all">🔥 Все товары</div>
+    <div class="shop-meta">
+      <span class="items-count" id="items-count">0</span>
+      <select class="sort-select" id="sort-select" onchange="renderProducts()">
+        <option value="default" data-i18n="sort_default">По умолчанию</option>
+        <option value="price-asc" data-i18n="sort_asc">Цена ↑</option>
+        <option value="price-desc" data-i18n="sort_desc">Цена ↓</option>
+      </select>
+    </div>
+  </div>
+  <div class="products-grid" id="products-grid"></div>
+</section>
+
+<!-- HOW -->
+<section id="how">
+  <div class="section-heading" data-i18n="how_title">Как купить?</div>
+  <p class="section-sub" data-i18n="how_sub">Всего 4 простых шага</p>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-title" data-i18n="step1t">Выбери товар</div><div class="step-desc" data-i18n="step1d">Добавь в корзину</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-title" data-i18n="step2t">Оформи заказ</div><div class="step-desc" data-i18n="step2d">Укажи ник и контакт</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-title" data-i18n="step3t">Оплати</div><div class="step-desc" data-i18n="step3d">Карта, Kaspi, ЮMoney</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-title" data-i18n="step4t">Получи!</div><div class="step-desc" data-i18n="step4d">Товар за 5–15 минут</div></div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="section-heading" style="text-align:center" data-i18n="faq_title">❓ FAQ</div>
+  <p class="section-sub" style="text-align:center" data-i18n="faq_sub">Частые вопросы</p>
+  <div id="faq-list"></div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-logo" id="el-footer-logo">Spike<span>_shop</span></span>
+  <p id="el-footer-desc" data-i18n="footer_desc">Твой надёжный магазин игровых товаров.</p>
+
+  <div style="display:flex;justify-content:center;gap:12px;margin:1.2rem 0 .5rem;flex-wrap:wrap">
+    <a href="https://t.me/spike_god16" target="_blank" class="social-btn" onmouseover="this.style.borderColor='rgba(41,182,246,.4)';this.style.background='rgba(41,182,246,.08)'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)';this.style.background='rgba(255,255,255,.04)'">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.93 6.612-1.683 7.932c-.126.566-.459.704-.93.438l-2.57-1.894-1.24 1.194c-.137.137-.252.252-.517.252l.185-2.623 4.768-4.307c.207-.185-.045-.288-.32-.103L7.55 14.28l-2.527-.79c-.549-.172-.56-.549.115-.814l9.617-3.706c.457-.165.858.103.175.642z" fill="#29b6f6"/></svg>
+      @spike_god16
+    </a>
+    <a href="https://www.youtube.com/@spike_god16" target="_blank" class="social-btn" onmouseover="this.style.borderColor='rgba(255,0,0,.4)';this.style.background='rgba(255,0,0,.08)'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)';this.style.background='rgba(255,255,255,.04)'">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="#ff0000"/></svg>
+      @spike_god16
+    </a>
+    <a href="https://www.tiktok.com/@spike_god16" target="_blank" class="social-btn" onmouseover="this.style.borderColor='rgba(255,255,255,.3)';this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)';this.style.background='rgba(255,255,255,.04)'">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z" fill="white"/></svg>
+      @spike_god16
+    </a>
+  </div>
+  <div class="footer-bottom">© 2026 Spike_shop</div>
+</footer>
+
+<!-- CART -->
+<div class="modal-overlay" id="cart-overlay" onclick="if(event.target===this)closeCart()">
+  <div class="cart-panel">
+    <div class="panel-header">
+      <div class="panel-title" data-i18n="cart_title">🛒 Корзина</div>
+      <button class="close-btn" onclick="closeCart()">✕</button>
+    </div>
+    <div id="cart-items-el"></div>
+    <div id="cart-footer-el" style="display:none">
+      <div class="cart-total-row"><span data-i18n="cart_total">Итого:</span><span class="cart-total-price" id="cart-total-el">0</span></div>
+      <button class="checkout-btn" onclick="openCheckout()" data-i18n="cart_checkout">💳 Оформить заказ</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKOUT -->
+<div class="big-modal" id="checkout-modal" onclick="if(event.target===this)closeCheckout()">
+  <div class="modal-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem">
+      <div class="modal-title">💳 Оформление</div>
+      <button class="close-btn" onclick="closeCheckout()">✕</button>
+    </div>
+    <div class="form-group">
+      <label>Ваше имя</label>
+      <input id="f-name" type="text" placeholder="Иван" oninput="this.value=this.value.replace(/[^a-zA-Zа-яА-ЯёЁ\s]/g,'')">
+    </div>
+    <div class="form-group">
+      <label>Ваш Telegram username <span style="color:var(--rb)">*</span></label>
+      <input id="f-tg" type="text" placeholder="@username" oninput="validateTg(this)">
+      <div id="tg-hint" style="font-size:11px;color:var(--rb);margin-top:4px;display:none">⚠️ Введите username в формате @username (только буквы, цифры и _)</div>
+    </div>
+    <div class="form-group">
+      <label>ID аккаунта</label>
+      <input id="f-nick" type="text" placeholder="Ваш ID в игре">
+    </div>
+    <div class="form-group">
+      <label>Игра</label>
+      <div id="f-game-display" style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px 13px;color:var(--text);font-size:14px;font-weight:600">—</div>
+      <input type="hidden" id="f-game">
+    </div>
+    <div class="order-summary-box" id="order-summary-el"></div>
+    <button class="pay-btn" onclick="submitOrder()">✅ Отправить заказ</button>
+  </div>
+</div>
+
+<!-- SUCCESS / PAYMENT -->
+<div class="big-modal" id="success-modal">
+  <div class="modal-box" style="text-align:center">
+    <div style="font-size:3rem;margin-bottom:.8rem">✅</div>
+    <div class="modal-title" style="text-align:center">Заказ принят!</div>
+    <p style="font-size:14px;color:var(--muted);line-height:1.6;margin:.8rem 0 1.2rem">Переведи оплату на карту и отправь скриншот нам в Telegram — после этого мы выдадим товар.</p>
+
+    <!-- CARD BLOCK -->
+    <div style="background:linear-gradient(135deg,#1a0d35,#0d1a35);border:1px solid var(--border2);border-radius:14px;padding:1.2rem 1.5rem;margin-bottom:1rem">
+      <div style="font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">Номер карты</div>
+      <div style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:3px;color:var(--text);margin-bottom:10px" id="card-num-display">4400 4302 0342 0077</div>
+      <button onclick="copyCard()" style="background:rgba(124,58,237,.2);border:1px solid var(--border2);border-radius:8px;padding:7px 18px;color:#a78bfa;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;cursor:pointer" id="copy-card-btn">📋 Скопировать</button>
+    </div>
+
+    <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:1.2rem;font-size:13px;color:var(--muted);line-height:1.7;text-align:left">
+      <strong style="color:var(--text)">Сумма к оплате:</strong> <span id="success-total" style="color:var(--gold);font-weight:700"></span><br>
+      <strong style="color:var(--text)">После оплаты:</strong> напиши нам в Telegram <a href="https://t.me/Ilianwsx" target="_blank" style="color:#a78bfa;text-decoration:none;font-weight:700">@Ilianwsx</a> и отправь скриншот перевода
+    </div>
+
+    <button class="pay-btn" onclick="document.getElementById('success-modal').classList.remove('open')">🏠 На главную</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ADMIN LOGIN -->
+<div class="admin-login" id="admin-login">
+  <div class="admin-login-box">
+    <span class="admin-login-icon">🔐</span>
+    <div class="admin-login-title" data-i18n="admin_login_title">Панель редактора</div>
+    <div class="admin-login-sub" data-i18n="admin_login_sub">Введите пароль для входа</div>
+    <input class="admin-login-input" id="admin-pass-input" type="password" placeholder="••••" onkeydown="if(event.key==='Enter')checkPass()">
+    <button class="admin-login-btn" onclick="checkPass()" data-i18n="admin_login_btn">Войти</button>
+    <div class="admin-hint" data-i18n="admin_login_hint">Введите пароль администратора</div>
+    <button class="admin-cancel" onclick="closeAdminLogin()" data-i18n="cancel">Отмена</button>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-overlay" id="admin-overlay">
+  <div class="admin-bar">
+    <span class="admin-logo">⚙️ Редактор</span>
+    <div class="admin-tabs">
+      <button class="a-tab active" onclick="showTab('tab-products',this)" data-i18n="tab_products">🛍️ Товары</button>
+      <button class="a-tab" onclick="showTab('tab-settings',this)" data-i18n="tab_settings">⚙️ Настройки</button>
+      <button class="a-tab" onclick="showTab('tab-faq',this)">❓ FAQ</button>
+    </div>
+    <button class="admin-close" onclick="closeAdmin()" data-i18n="admin_close">✕ Закрыть</button>
+  </div>
+  <div class="admin-body">
+    <div class="admin-inner">
+
+      <!-- PRODUCTS -->
+      <div class="a-section active" id="tab-products">
+        <div class="a-title" data-i18n="prod_title">🛍️ Управление товарами</div>
+        <div class="a-sub" data-i18n="prod_sub">Добавляй, редактируй, удаляй товары. Загружай свои фото с компьютера.</div>
+        <div class="prod-list" id="admin-prod-list"></div>
+        <button class="btn-add-prod" onclick="openProdForm()" data-i18n="btn_add_prod">+ Добавить товар</button>
+        <div class="prod-form" id="prod-form">
+          <div class="prod-form-title" id="pf-title-el">➕ Новый товар</div>
+          <div class="pf-grid">
+            <div class="pf-field"><label data-i18n="field_pname">Название</label><input id="pf-name" type="text" placeholder="Robux 400"></div>
+            <div class="pf-field"><label data-i18n="field_pgame">Игра</label>
+              <select id="pf-game"><option value="rb">Roblox</option><option value="bs">Brawl Stars</option><option value="cr">Clash Royale</option><option value="coc">Clash of Clans</option></select>
+            </div>
+            <div class="pf-field"><label data-i18n="field_pprice">Цена (в рублях)</label><input id="pf-price" type="number" placeholder="299"></div>
+            <div class="pf-field"><label data-i18n="field_poldprice">Старая цена (если нужна)</label><input id="pf-oldprice" type="number" placeholder=""></div>
+            <div class="pf-field"><label data-i18n="field_pemoji">Эмодзи (если без фото)</label><input id="pf-emoji" type="text" placeholder="💎"></div>
+            <div class="pf-field"><label data-i18n="field_pbadge">Бейдж</label>
+              <select id="pf-badge"><option value="">Без бейджа</option><option value="hot">🔥 Хит</option><option value="sale">💸 Скидка</option><option value="new">✨ Новинка</option></select>
+            </div>
+            <div class="pf-field full"><label data-i18n="field_pdesc">Описание (RU)</label><textarea id="pf-desc" rows="2" placeholder="Краткое описание"></textarea></div>
+            <div class="pf-field full"><label>Описание (EN)</label><textarea id="pf-desc-en" rows="2" placeholder="Short description in English"></textarea></div>
+            <div class="pf-field full"><label>Сипаттама (KZ)</label><textarea id="pf-desc-kz" rows="2" placeholder="Қысқаша сипаттама"></textarea></div>
+            <div class="pf-field full"><label data-i18n="field_pphoto">📸 Фото (загрузи с компьютера)</label>
+              <div class="photo-zone" id="photo-zone">
+                <input type="file" accept="image/*" id="pf-photo-input" onchange="handlePhoto(this)">
+                <span class="photo-zone-icon" id="pz-icon">📸</span>
+                <div class="photo-zone-text" id="pz-text"><strong>Нажми или перетащи фото</strong><br><small>JPG, PNG, GIF — до 5 МБ</small></div>
+                <img class="photo-preview-img" id="pf-preview" src="" alt="">
+                <button class="btn-clear-photo" id="btn-clear-photo" type="button" onclick="clearPhoto(event)">✕ Убрать</button>
+              </div>
+            </div>
+            <div class="pf-actions full" style="margin-top:.5rem">
+              <button class="btn-pf-save" onclick="saveProduct()" data-i18n="btn_save">💾 Сохранить</button>
+              <button class="btn-pf-cancel" onclick="closeProdForm()" data-i18n="cancel">Отмена</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="a-section" id="tab-settings">
+        <div class="a-title" data-i18n="settings_title">⚙️ Настройки сайта</div>
+        <div class="a-sub" data-i18n="settings_sub">Меняй название, контакты и пароль.</div>
+        <div class="s-grid">
+          <div class="s-field"><label data-i18n="s_name">Название магазина</label><input id="s-name" type="text" placeholder="Spike_shop"></div>
+          <div class="s-field"><label data-i18n="s_badge">Бейдж в шапке</label><input id="s-badge" type="text"></div>
+          <div class="s-field full"><label data-i18n="s_sub">Описание</label><input id="s-sub" type="text"></div>
+          <div class="s-field"><label>Telegram</label><input id="s-tg" type="text" placeholder="https://t.me/..."></div>
+          <div class="s-field"><label>Email</label><input id="s-email" type="text"></div>
+          <div class="s-field"><label data-i18n="s_stat3">Время доставки</label><input id="s-stat3" type="text" placeholder="5 мин"></div>
+          <div class="s-divider"></div>
+          <div class="s-field"><label data-i18n="s_pass1">Новый пароль</label><input id="s-pass1" type="password" placeholder="Оставь пустым — без изменений"></div>
+          <div class="s-field"><label data-i18n="s_pass2">Повтори пароль</label><input id="s-pass2" type="password"></div>
+        </div>
+        <button class="btn-save-settings" onclick="saveSettings()" data-i18n="btn_save_settings">💾 Сохранить настройки</button>
+      </div>
+
+      <!-- FAQ -->
+      <div class="a-section" id="tab-faq">
+        <div class="a-title">❓ FAQ</div>
+        <div class="a-sub" data-i18n="faq_admin_sub">Управляй вопросами и ответами.</div>
+        <div class="faq-form" id="faq-form">
+          <div class="faq-form-fields">
+            <div><label data-i18n="faq_q">Вопрос</label><input id="faq-q-in" type="text" placeholder="Как быстро придёт товар?"></div>
+            <div><label data-i18n="faq_a">Ответ</label><textarea id="faq-a-in" rows="3" placeholder="Подробный ответ..."></textarea></div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn-pf-save" onclick="saveFaq()" data-i18n="btn_save">💾 Сохранить</button>
+            <button class="btn-pf-cancel" onclick="closeFaqForm()" data-i18n="cancel">Отмена</button>
+          </div>
+        </div>
+        <div class="faq-admin-list" id="faq-admin-list"></div>
+        <button class="btn-add-prod" onclick="openFaqForm()" data-i18n="btn_add_faq">+ Добавить вопрос</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCRIPT ═══════════════ -->
+<script>
+// ── I18N ──
+const i18n = {
+  ru:{
+    nav_shop:'Магазин',nav_how:'Как купить',nav_editor:'⚙️ Редактор',nav_cart:'Корзина',
+    hero_badge:'Лучший игровой магазин 2025',hero_title:'Всё для твоих\nлюбимых игр',
+    hero_sub:'Roblox, Brawl Stars, Clash Royale, Clash of Clans — покупай валюту, пропуски и предметы быстро и выгодно.',
+    hero_btn1:'🛍️ В магазин',hero_btn2:'Как это работает?',
+    stat_games:'Игры',stat_delivery:'Доставка',
+    tab_all:'🎮 Все',shop_all:'🔥 Все товары',
+    sort_default:'По умолчанию',sort_asc:'Цена ↑',sort_desc:'Цена ↓',sort_name:'Название',
+    how_title:'Как купить?',how_sub:'Всего 4 простых шага',
+    step1t:'Выбери товар',step1d:'Добавь в корзину',
+    step2t:'Оформи заказ',step2d:'Укажи ник и контакт',
+    step3t:'Оплати',step3d:'Карта, Kaspi, ЮMoney',
+    step4t:'Получи!',step4d:'Товар за 5–15 минут',
+    faq_title:'❓ FAQ',faq_sub:'Частые вопросы',
+    footer_desc:'Твой надёжный магазин игровых товаров.',
+    cart_title:'🛒 Корзина',cart_total:'Итого:',cart_checkout:'💳 Оформить заказ',
+    checkout_title:'💳 Оформление',
+    field_name:'Ваше имя',field_contact:'Email или Telegram',field_nick:'Ник в игре / ID',
+    field_game:'Игра',field_pay:'Способ оплаты',select_game:'Выберите...',select_pay:'Выберите...',
+    btn_submit:'✅ Отправить заказ',
+    success_title:'Заказ принят!',success_sub:'Мы свяжемся с вами в ближайшее время. Спасибо!',success_btn:'🏠 На главную',
+    admin_login_title:'Панель редактора',admin_login_sub:'Введите пароль для входа',admin_login_btn:'Войти',admin_login_hint:'Введите пароль администратора',
+    cancel:'Отмена',
+    tab_products:'🛍️ Товары',tab_settings:'⚙️ Настройки',tab_orders:'📋 Заказы',
+    admin_close:'✕ Закрыть',
+    prod_title:'🛍️ Управление товарами',prod_sub:'Добавляй, редактируй, удаляй товары.',
+    btn_add_prod:'+ Добавить товар',btn_save:'💾 Сохранить',
+    field_pname:'Название',field_pgame:'Игра',field_pprice:'Цена (в рублях)',
+    field_poldprice:'Старая цена',field_pemoji:'Эмодзи (если без фото)',field_pbadge:'Бейдж',
+    field_pdesc:'Описание',field_pphoto:'📸 Фото (загрузи с компьютера)',
+    settings_title:'⚙️ Настройки сайта',settings_sub:'Меняй название, контакты и пароль.',
+    s_name:'Название магазина',s_badge:'Бейдж в шапке',s_sub:'Описание',s_stat3:'Время доставки',s_pass1:'Новый пароль',s_pass2:'Повтори пароль',
+    btn_save_settings:'💾 Сохранить настройки',
+    faq_admin_sub:'Управляй вопросами и ответами.',faq_q:'Вопрос',faq_a:'Ответ',btn_add_faq:'+ Добавить вопрос',
+    orders_title:'📋 Заказы',orders_sub:'Все входящие заказы от покупателей.',
+    toast_added:'добавлен в корзину',toast_saved:'Товар сохранён!',toast_deleted:'Товар удалён',
+    toast_settings:'Настройки сохранены!',toast_pass_changed:'Пароль изменён!',
+    toast_pass_mismatch:'Пароли не совпадают!',toast_pass_short:'Пароль минимум 4 символа',
+    toast_fill:'Заполните все поля!',toast_fill_prod:'Введите название и цену',toast_fill_faq:'Заполните вопрос и ответ',
+    toast_wrong_pass:'Неверный пароль',toast_big_file:'Файл слишком большой (макс. 5 МБ)',
+    done_btn:'Выполнен ✓',no_orders:'📭 Заказов пока нет',cart_empty:'😔 Корзина пуста',nothing_found:'😔 Ничего не найдено',
+    items:'товаров',order_done:'✅ Заказ выполнен',
+  },
+  en:{
+    nav_shop:'Shop',nav_how:'How to buy',nav_editor:'⚙️ Editor',nav_cart:'Cart',
+    hero_badge:'Best Gaming Shop 2025',hero_title:'Everything for your\nfavorite games',
+    hero_sub:'Roblox, Brawl Stars, Clash Royale, Clash of Clans — buy currency, passes and items fast and at the best price.',
+    hero_btn1:'🛍️ Shop now',hero_btn2:'How does it work?',
+    stat_games:'Games',stat_delivery:'Delivery',
+    tab_all:'🎮 All',shop_all:'🔥 All products',
+    sort_default:'Default',sort_asc:'Price ↑',sort_desc:'Price ↓',sort_name:'Name',
+    how_title:'How to buy?',how_sub:'Just 4 simple steps',
+    step1t:'Choose item',step1d:'Add to cart',
+    step2t:'Place order',step2d:'Enter nickname & contact',
+    step3t:'Pay',step3d:'Card, PayPal & more',
+    step4t:'Done!',step4d:'Item in 5 minutes',
+    faq_title:'❓ FAQ',faq_sub:'Common questions',
+    footer_desc:'Your reliable gaming store.',
+    cart_title:'🛒 Cart',cart_total:'Total:',cart_checkout:'💳 Checkout',
+    checkout_title:'💳 Checkout',
+    field_name:'Your name',field_contact:'Email or Telegram',field_nick:'In-game nick / ID',
+    field_game:'Game',field_pay:'Payment method',select_game:'Choose...',select_pay:'Choose...',
+    btn_submit:'✅ Submit order',
+    success_title:'Order placed!',success_sub:'We will contact you shortly. Thank you!',success_btn:'🏠 Back to home',
+    admin_login_title:'Editor panel',admin_login_sub:'Enter password to login',admin_login_btn:'Login',admin_login_hint:'Enter admin password',
+    cancel:'Cancel',
+    tab_products:'🛍️ Products',tab_settings:'⚙️ Settings',tab_orders:'📋 Orders',
+    admin_close:'✕ Close',
+    prod_title:'🛍️ Manage products',prod_sub:'Add, edit, delete products. Upload your photos.',
+    btn_add_prod:'+ Add product',btn_save:'💾 Save',
+    field_pname:'Name',field_pgame:'Game',field_pprice:'Price (in RUB)',
+    field_poldprice:'Old price',field_pemoji:'Emoji (if no photo)',field_pbadge:'Badge',
+    field_pdesc:'Description',field_pphoto:'📸 Photo (upload from computer)',
+    settings_title:'⚙️ Site settings',settings_sub:'Change name, contacts and password.',
+    s_name:'Shop name',s_badge:'Header badge',s_sub:'Description',s_stat3:'Delivery time',s_pass1:'New password',s_pass2:'Repeat password',
+    btn_save_settings:'💾 Save settings',
+    faq_admin_sub:'Manage questions and answers.',faq_q:'Question',faq_a:'Answer',btn_add_faq:'+ Add question',
+    orders_title:'📋 Orders',orders_sub:'All incoming orders.',
+    toast_added:'added to cart',toast_saved:'Product saved!',toast_deleted:'Product deleted',
+    toast_settings:'Settings saved!',toast_pass_changed:'Password changed!',
+    toast_pass_mismatch:'Passwords do not match!',toast_pass_short:'Password min 4 characters',
+    toast_fill:'Fill in all fields!',toast_fill_prod:'Enter name and price',toast_fill_faq:'Fill in question and answer',
+    toast_wrong_pass:'Wrong password',toast_big_file:'File too large (max 5 MB)',
+    done_btn:'Done ✓',no_orders:'📭 No orders yet',cart_empty:'😔 Cart is empty',nothing_found:'😔 Nothing found',
+    items:'items',order_done:'✅ Order done',
+  },
+  kz:{
+    nav_shop:'Дүкен',nav_how:'Қалай сатып алу',nav_editor:'⚙️ Редактор',nav_cart:'Себет',
+    hero_badge:'2025 жылғы үздік ойын дүкені',hero_title:'Сүйікті ойындарың\nүшін бәрі',
+    hero_sub:'Roblox, Brawl Stars, Clash Royale, Clash of Clans — валюта, пасстар мен заттарды жылдам және тиімді бағада сатып ал.',
+    hero_btn1:'🛍️ Дүкенге өту',hero_btn2:'Қалай жұмыс істейді?',
+    stat_games:'Ойындар',stat_delivery:'Жеткізу',
+    tab_all:'🎮 Барлығы',shop_all:'🔥 Барлық тауарлар',
+    sort_default:'Әдепкі',sort_asc:'Баға ↑',sort_desc:'Баға ↓',sort_name:'Атауы',
+    how_title:'Қалай сатып алу керек?',how_sub:'Тек 4 қарапайым қадам',
+    step1t:'Тауар таңда',step1d:'Себетке қос',
+    step2t:'Тапсырыс бер',step2d:'Ник пен контактіні жаз',
+    step3t:'Төле',step3d:'Карта, Kaspi және т.б.',
+    step4t:'Ал!',step4d:'Тауар 5 минутта',
+    faq_title:'❓ Жиі қойылатын сұрақтар',faq_sub:'Жиі сұрақтар',
+    footer_desc:'Сенімді ойын тауарлары дүкені.',
+    cart_title:'🛒 Себет',cart_total:'Барлығы:',cart_checkout:'💳 Тапсырыс беру',
+    checkout_title:'💳 Тапсырыс рәсімдеу',
+    field_name:'Атыңыз',field_contact:'Email немесе Telegram',field_nick:'Ойын ники / ID',
+    field_game:'Ойын',field_pay:'Төлем тәсілі',select_game:'Таңдаңыз...',select_pay:'Таңдаңыз...',
+    btn_submit:'✅ Тапсырыс жіберу',
+    success_title:'Тапсырыс қабылданды!',success_sub:'Жақын арада хабарласамыз. Рахмет!',success_btn:'🏠 Басты бетке',
+    admin_login_title:'Редактор панелі',admin_login_sub:'Кіру үшін құпия сөзді енгізіңіз',admin_login_btn:'Кіру',admin_login_hint:'Әкімші құпия сөзін енгізіңіз',
+    cancel:'Болдырмау',
+    tab_products:'🛍️ Тауарлар',tab_settings:'⚙️ Баптаулар',tab_orders:'📋 Тапсырыстар',
+    admin_close:'✕ Жабу',
+    prod_title:'🛍️ Тауарларды басқару',prod_sub:'Тауар қосу, өңдеу, жою. Фото жүктеу.',
+    btn_add_prod:'+ Тауар қосу',btn_save:'💾 Сақтау',
+    field_pname:'Атауы',field_pgame:'Ойын',field_pprice:'Баға (рубльмен)',
+    field_poldprice:'Ескі баға',field_pemoji:'Эмодзи (фотосыз болса)',field_pbadge:'Белгі',
+    field_pdesc:'Сипаттама',field_pphoto:'📸 Фото (компьютерден жүктеу)',
+    settings_title:'⚙️ Сайт баптаулары',settings_sub:'Атауды, контактіні және құпия сөзді өзгерт.',
+    s_name:'Дүкен атауы',s_badge:'Тақырып белгісі',s_sub:'Сипаттама',s_stat3:'Жеткізу уақыты',s_pass1:'Жаңа құпия сөз',s_pass2:'Құпия сөзді қайталаңыз',
+    btn_save_settings:'💾 Баптауларды сақтау',
+    faq_admin_sub:'Сұрақтар мен жауаптарды басқару.',faq_q:'Сұрақ',faq_a:'Жауап',btn_add_faq:'+ Сұрақ қосу',
+    orders_title:'📋 Тапсырыстар',orders_sub:'Барлық кіріс тапсырыстар.',
+    toast_added:'себетке қосылды',toast_saved:'Тауар сақталды!',toast_deleted:'Тауар жойылды',
+    toast_settings:'Баптаулар сақталды!',toast_pass_changed:'Құпия сөз өзгертілді!',
+    toast_pass_mismatch:'Құпия сөздер сәйкес келмейді!',toast_pass_short:'Құпия сөз кемінде 4 таңба',
+    toast_fill:'Барлық өрістерді толтырыңыз!',toast_fill_prod:'Атауы мен бағасын енгізіңіз',toast_fill_faq:'Сұрақ пен жауапты толтырыңыз',
+    toast_wrong_pass:'Қате құпия сөз',toast_big_file:'Файл тым үлкен (макс. 5 МБ)',
+    done_btn:'Орындалды ✓',no_orders:'📭 Тапсырыс жоқ',cart_empty:'😔 Себет бос',nothing_found:'😔 Ештеңе табылмады',
+    items:'тауар',order_done:'✅ Тапсырыс орындалды',
+  }
+};
+
+// ── CURRENCY ──
+const currencyRates = {RUB:1, USD:0.011, EUR:0.010, KZT:4.95, UAH:0.43};
+const currencySymbols = {RUB:'₽', USD:'$', EUR:'€', KZT:'₸', UAH:'₴'};
+let currentCurrency = 'RUB';
+let currentLang = 'ru';
+
+function formatPrice(rubPrice) {
+  const converted = rubPrice * currencyRates[currentCurrency];
+  const symbol = currencySymbols[currentCurrency];
+  const rounded = currentCurrency === 'RUB' || currentCurrency === 'KZT' || currentCurrency === 'UAH'
+    ? Math.round(converted).toLocaleString()
+    : converted.toFixed(2);
+  return symbol + ' ' + rounded;
+}
+
+function changeCurrency(val) {
+  currentCurrency = val;
+  renderProducts();
+  renderCartItems();
+  updateCartUI();
+}
+
+async function translateDescs(lang) {
+  const products = D.products.filter(p => p.desc && !p['desc_'+lang]);
+  if (!products.length) return;
+  const names = products.map(p => `[${p.id}] ${p.desc}`).join('\n');
+  const langName = lang === 'en' ? 'English' : 'Kazakh';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `Translate each line to ${langName}. Keep the [id] prefix. Return ONLY the translated lines, nothing else:\n${names}`
+        }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content[0].text;
+    text.split('\n').forEach(line => {
+      const m = line.match(/^\[(\d+)\]\s+(.+)/);
+      if (m) {
+        const prod = D.products.find(p => String(p.id) === m[1]);
+        if (prod) { prod['desc_'+lang] = m[2].trim(); }
+      }
+    });
+    save();
+    renderProducts();
+  } catch(e) { console.error('Translate error', e); }
+}
+
+function changeLang(val) {
+  currentLang = val;
+  document.documentElement.lang = val;
+  applyLang();
+  renderProducts();
+  renderFaq();
+  if (val !== 'ru') translateDescs(val);
+}
+
+function t(key) { return (i18n[currentLang] && i18n[currentLang][key]) || (i18n.ru[key]) || key; }
+
+function applyLang() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const val = t(key);
+    if(el.tagName === 'INPUT' && el.type === 'placeholder') el.placeholder = val;
+    else el.textContent = val;
+  });
+  // Update search placeholder
+  document.getElementById('nav-search').placeholder = currentLang === 'en' ? '🔍 Search...' : currentLang === 'kz' ? '🔍 Іздеу...' : '🔍 Поиск...';
+  // Reapply shop title
+  document.getElementById('shop-title').textContent = t('shop_all');
+}
+
+// ── DATA ──
+const KEY = 'spikeshop_v1';
+function defaults() {
+  return {
+    pass:'plmokniuy1661',
+    settings:{
+      name:'Spike_shop',badge:'Лучший игровой магазин 2025',
+      sub:'Roblox, Brawl Stars, Clash Royale, Clash of Clans — покупай валюту, пропуски и предметы быстро и выгодно.',
+      tg:'https://t.me/spikeshop',email:'info@spikeshop.ru',stat3:'5–15 мин',
+    },
+    products:[
+      {id:1,name:'Robux 400',game:'rb',price:299,oldPrice:null,emoji:'💎',badge:'hot',desc:'400 Robux на аккаунт',photo:null,inStock:true},
+      {id:2,name:'Robux 800',game:'rb',price:549,oldPrice:null,emoji:'💎',badge:null,desc:'800 Robux на аккаунт',photo:null,inStock:true},
+      {id:3,name:'Robux 1700',game:'rb',price:999,oldPrice:1199,emoji:'👑',badge:'sale',desc:'Выгодный пак Robux',photo:null,inStock:true},
+      {id:4,name:'Гемы 80',game:'bs',price:149,oldPrice:null,emoji:'💜',badge:null,desc:'80 гемов в Brawl Stars',photo:null,inStock:true},
+      {id:5,name:'Гемы 360',game:'bs',price:529,oldPrice:599,emoji:'💎',badge:'sale',desc:'360 гемов — лучшая цена',photo:null,inStock:true},
+      {id:6,name:'Brawl Pass',game:'bs',price:449,oldPrice:549,emoji:'🏆',badge:'sale',desc:'Боевой пропуск на сезон',photo:null,inStock:true},
+      {id:7,name:'Самоцветы 80',game:'cr',price:299,oldPrice:null,emoji:'💎',badge:'hot',desc:'80 самоцветов CR',photo:null,inStock:true},
+      {id:8,name:'Pass Royale',game:'cr',price:399,oldPrice:499,emoji:'👑',badge:'sale',desc:'Королевский пропуск',photo:null,inStock:true},
+      {id:9,name:'Гемы 500',game:'coc',price:399,oldPrice:null,emoji:'💎',badge:'hot',desc:'500 гемов CoC',photo:null,inStock:true},
+      {id:10,name:'Гемы 1200',game:'coc',price:849,oldPrice:999,emoji:'💎',badge:'sale',desc:'1200 гемов — большой пак',photo:null,inStock:true},
+    ],
+    faq:[
+      {id:1,q:'Как быстро я получу товар?',a:'После оплаты отправляем в течение 5–15 минут. Обычно мгновенно!'},
+      {id:2,q:'Какие способы оплаты вы принимаете?',a:'Карты, Kaspi Pay, ЮMoney, СБЕР, PayPal. Пишите в Telegram.'},
+      {id:3,q:'Безопасно ли это?',a:'Да! Только официальные методы. Пароль не просим — только ник.'},
+      {id:4,q:'Что если что-то пошло не так?',a:'Напишите нам — разберёмся в течение часа!'},
+    ],
+    orders:[]
+  };
+}
+function load(){try{const r=localStorage.getItem(KEY);return r?{...defaults(),...JSON.parse(r)}:defaults();}catch{return defaults();}}
+function save(){
+  try {
+    localStorage.setItem(KEY, JSON.stringify(D));
+  } catch(e) {
+    if(e.name === 'QuotaExceededError' || e.code === 22) {
+      // Попытка сохранить без фотографий, если не хватает места
+      try {
+        const lite = JSON.parse(JSON.stringify(D));
+        // Находим самые тяжёлые фото и сжимаем их до меньшего размера
+        // Сначала пробуем сохранить как есть но без самых больших фото
+        const sizes = lite.products.map((p,i) => ({i, size: p.photo ? p.photo.length : 0}));
+        sizes.sort((a,b) => b.size - a.size);
+        // Убираем фото у самого тяжёлого товара и пробуем снова
+        for(const s of sizes) {
+          if(s.size === 0) break;
+          lite.products[s.i].photo = null;
+          try {
+            localStorage.setItem(KEY, JSON.stringify(lite));
+            // Если сохранилось — обновляем D тоже
+            D.products[s.i].photo = null;
+            toast('⚠️ Хранилище переполнено! Фото товара "' + D.products[s.i].name + '" удалено — загружайте фото меньшего размера.');
+            return;
+          } catch(e2) { continue; }
+        }
+        toast('⚠️ Хранилище браузера переполнено! Уменьшите размер фотографий.');
+      } catch(e3) {
+        toast('⚠️ Ошибка сохранения: хранилище переполнено!');
+      }
+    }
+  }
+}
+
+// ── БЛОКИРОВКА ПРОСМОТРА КОДА ──
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  // Ctrl+U (просмотр кода)
+  if(e.ctrlKey && e.key==='u') e.preventDefault();
+  // Ctrl+S (сохранить страницу)
+  if(e.ctrlKey && e.key==='s') e.preventDefault();
+  // F12 (DevTools)
+  if(e.key==='F12') e.preventDefault();
+  // Ctrl+Shift+I (DevTools)
+  if(e.ctrlKey && e.shiftKey && e.key==='I') e.preventDefault();
+  // Ctrl+Shift+J (Console)
+  if(e.ctrlKey && e.shiftKey && e.key==='J') e.preventDefault();
+  // Ctrl+Shift+C (Inspector)
+  if(e.ctrlKey && e.shiftKey && e.key==='C') e.preventDefault();
+});
+let secretState={logo:0,games:[],required:['bs','rb','cr','coc']};
+let secretTimer=null;
+function secretClick(type){
+  clearTimeout(secretTimer);
+  secretTimer=setTimeout(()=>{secretState={logo:0,games:[],required:['bs','rb','cr','coc']};},8000);
+  if(type==='logo'){
+    secretState.logo++;
+    if(secretState.logo>10)secretState.logo=10;
+  }
+  if(type!=='logo'&&secretState.logo>=10){
+    const next=secretState.required[secretState.games.length];
+    if(type===next){
+      secretState.games.push(type);
+    } else {
+      // неправильный порядок — сброс игр
+      secretState.games=[];
+      if(type===secretState.required[0]) secretState.games.push(type);
+    }
+  }
+  if(secretState.logo>=10&&secretState.games.length>=4){
+    secretState={logo:0,games:[],required:['bs','rb','cr','coc']};
+    clearTimeout(secretTimer);
+    openAdminLogin();
+  }
+}
+let D=load();
+let cart=[];
+let currentFilter='all';
+let editProdId=null,editFaqId=null,currentPhoto=null,photoUploadDone=false;
+let uid=()=>Date.now()+Math.floor(Math.random()*9999);
+
+// ── JSONBIN SYNC ──
+const BIN_ID = '6a0170f0c0954111d806be2e';
+const API_KEY = '$2a$10$.ObhouZxxIBHJbTGgfIfU.qzHUP3VqOQW6P5SNecZs0dTJU39.yTO';
+const BIN_URL = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
+
+async function sheetsGet() {
+  try {
+    const r = await fetch(BIN_URL + '/latest', {
+      headers: { 'X-Master-Key': API_KEY }
+    });
+    const json = await r.json();
+    const products = json.record && json.record.products;
+    if (Array.isArray(products) && products.length > 0) {
+      // Если в JSONBin есть ссылка ImgBB — берём её, иначе берём локальную
+      const localPhotos = {};
+      D.products.forEach(p => { if(p.photo) localPhotos[p.id] = p.photo; });
+      D.products = products.map(p => ({
+        ...p,
+        photo: p.photo || (localPhotos[p.id] && localPhotos[p.id].startsWith('http') ? localPhotos[p.id] : null)
+      }));
+      save();
+      renderProducts();
+      if (document.getElementById('admin-overlay').classList.contains('open')) {
+        renderAdminProducts();
+      }
+    }
+  } catch(e) { console.log('JSONBin get error:', e); }
+}
+
+async function sheetsSave() {
+  try {
+    // Отправляем фото — теперь это ссылки ImgBB, не base64
+    const productsToSave = D.products.map(p => {
+      const photo = p.photo && p.photo.startsWith('http') ? p.photo : null;
+      return {...p, photo};
+    });
+    await fetch(BIN_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': API_KEY
+      },
+      body: JSON.stringify({ products: productsToSave })
+    });
+  } catch(e) { console.log('JSONBin save error:', e); }
+}
+const gameBg={
+  rb:'linear-gradient(135deg,#1a0810 0%,#2d0f1c 100%)',
+  bs:'linear-gradient(135deg,#0d0822 0%,#1a1040 100%)',
+  cr:'linear-gradient(135deg,#061525 0%,#0d2040 100%)',
+  coc:'linear-gradient(135deg,#051505 0%,#0d2010 100%)',
+};
+const tagCls={rb:'tag-rb',bs:'tag-bs',cr:'tag-cr',coc:'tag-coc'};
+const tagLbl={rb:'ROBLOX',bs:'BRAWL',cr:'CLASH R.',coc:'CLASH CoC'};
+const gameName={rb:'Roblox',bs:'Brawl Stars',cr:'Clash Royale',coc:'Clash of Clans'};
+
+let toastT;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2800);
+}
+
+function applySettings(){
+  const s=D.settings;
+  // Обновляем старое значение доставки
+  if(s.stat3==='5 мин'){s.stat3='5–15 мин';save();}
+  document.title=s.name||'Spike_shop';
+  const badge=document.getElementById('el-badge');if(badge)badge.textContent=s.badge||'';
+  const sub=document.getElementById('el-sub');if(sub)sub.textContent=s.sub||'';
+  const stat3=document.getElementById('el-stat3');if(stat3)stat3.textContent=s.stat3||'5–15 мин';
+  const footerDesc=document.getElementById('el-footer-desc');if(footerDesc)footerDesc.textContent=t('footer_desc');
+  const tg=document.getElementById('el-tg');if(tg){tg.href=s.tg||'#';tg.textContent='Telegram';}
+  const em=document.getElementById('el-email');if(em){em.href='mailto:'+(s.email||'');em.textContent=s.email||'Email';}
+}
+
+// ── RENDER PRODUCTS ──
+function renderProducts(){
+  const grid=document.getElementById('products-grid');
+  // Запоминаем открытые описания
+  const openIds=new Set();
+  grid.querySelectorAll('.product-card[data-id]').forEach(card=>{
+    if(card.querySelector('.product-desc.expanded')) openIds.add(card.dataset.id);
+  });
+  const q=(document.getElementById('nav-search').value||'').toLowerCase();
+  const sort=document.getElementById('sort-select').value;
+  let list=D.products.filter(p=>{
+    const gm=currentFilter==='all'||p.game===currentFilter;
+    const sr=p.name.toLowerCase().includes(q)||(p.desc||'').toLowerCase().includes(q);
+    return gm&&sr;
+  });
+  if(sort==='price-asc') list.sort((a,b)=>a.price-b.price);
+  if(sort==='price-desc') list.sort((a,b)=>b.price-a.price);
+  if(sort==='name') list.sort((a,b)=>a.name.localeCompare(b.name));
+  document.getElementById('items-count').textContent=list.length+' '+t('items');
+  if(!list.length){grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:4rem;color:var(--muted);font-size:15px">${t('nothing_found')}</div>`;return;}
+  const badgeLbl={hot:'🔥 '+( currentLang==='en'?'HOT':currentLang==='kz'?'ХИТ':'ХИТ'),sale:'💸 '+(currentLang==='en'?'SALE':currentLang==='kz'?'ЖЕҢІЛДІК':'СКИДКА'),new:'✨ '+(currentLang==='en'?'NEW':currentLang==='kz'?'ЖАҢА':'НОВИНКА')};
+  const oosLabel=currentLang==='en'?'Out of stock':currentLang==='kz'?'Жоқ':'Нет в наличии';
+  grid.innerHTML=list.map(p=>{
+    const inStock=p.inStock!==false;
+    return `
+    <div class="product-card${inStock?'':' oos'}" data-id="${p.id}">
+      <div class="product-img${p.photo?' has-photo':''}" style="background:${gameBg[p.game]}">
+        ${p.badge&&inStock?`<div class="badge badge-${p.badge}">${badgeLbl[p.badge]}</div>`:''}
+        ${p.photo?`<img src="${p.photo}" alt="${p.name}">`:(p.emoji||'🎮')}
+        ${!inStock?`<div class="out-of-stock-badge">🚫 ${oosLabel}</div>`:''}
+      </div>
+      <div class="product-body">
+        <div class="game-tag ${tagCls[p.game]}">${tagLbl[p.game]}</div>
+        <div class="product-name">${p.name}</div>
+        ${(p.desc||p.desc_en||p.desc_kz)?`<button class="desc-toggle" onclick="toggleDesc(this)" aria-expanded="false">${currentLang==='en'?'Description':currentLang==='kz'?'Сипаттама':'Описание'} <span class="desc-toggle-arrow">▼</span></button><div class="product-desc">${currentLang==='en'?(p.desc_en||p.desc||''):currentLang==='kz'?(p.desc_kz||p.desc||''):p.desc||''}</div>`:''}
+        <div class="product-footer">
+          <div class="price-wrap">
+            ${p.oldPrice?`<div class="old-price">${formatPrice(p.oldPrice)}</div>`:''}
+            <div class="product-price">${formatPrice(p.price)}</div>
+          </div>
+          <button class="add-btn" onclick="${inStock?`addToCart(${p.id})`:''}" ${inStock?'':'disabled'} title="${inStock?'':''+oosLabel}">+</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  // Восстанавливаем открытые описания
+  if(openIds.size){
+    grid.querySelectorAll('.product-card[data-id]').forEach(card=>{
+      if(openIds.has(card.dataset.id)){
+        const btn=card.querySelector('.desc-toggle');
+        const desc=card.querySelector('.product-desc');
+        if(btn&&desc){desc.classList.add('expanded');btn.classList.add('open');btn.setAttribute('aria-expanded','true');}
+      }
+    });
+  }
+}
+
+function toggleDesc(btn){
+  const desc=btn.nextElementSibling;
+  const isOpen=desc.classList.toggle('expanded');
+  btn.classList.toggle('open',isOpen);
+  btn.setAttribute('aria-expanded',isOpen);
+}
+
+function setFilter(game,el){
+  currentFilter=game;
+  document.querySelectorAll('.game-tab').forEach(t=>t.classList.remove('active'));
+  (el||document.querySelector(`.game-tab[data-game="${game}"]`)).classList.add('active');
+  const titles={all:t('shop_all'),rb:'🎮 Roblox',bs:'⚡ Brawl Stars',cr:'👑 Clash Royale',coc:'🏰 Clash of Clans'};
+  document.getElementById('shop-title').textContent=titles[game];
+  renderProducts();
+  document.getElementById('shop').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ── CART ──
+function addToCart(id){
+  const p=D.products.find(x=>x.id===id);if(!p)return;
+  // Проверяем что все товары в корзине из одной игры
+  if(cart.length>0 && cart[0].game !== p.game){
+    const gameNames={rb:'Roblox',bs:'Brawl Stars',cr:'Clash Royale',coc:'Clash of Clans'};
+    const inCart=gameNames[cart[0].game]||cart[0].game;
+    toast('⚠️ Сначала очистите корзину!');
+    return;
+  }
+  // Максимум 3 одинаковых товара
+  const sameCount = cart.filter(x=>x.id===p.id).length;
+  if(sameCount >= 2){
+    toast('⚠️ Максимум 2 штуки одного товара!');
+    return;
+  }
+  cart.push({...p,cid:uid()});
+  updateCartUI();
+  toast('✅ '+p.name+' '+t('toast_added'));
+}
+function removeFromCart(cid){cart=cart.filter(x=>x.cid!==cid);updateCartUI();renderCartItems();}
+function updateCartUI(){
+  const total=cart.reduce((s,x)=>s+x.price,0);
+  document.getElementById('cart-count').textContent=cart.length;
+  document.getElementById('cart-label').textContent=cart.length?formatPrice(total):t('nav_cart');
+}
+function openCart(){renderCartItems();document.getElementById('cart-overlay').classList.add('open');}
+function closeCart(){document.getElementById('cart-overlay').classList.remove('open');}
+function renderCartItems(){
+  const list=document.getElementById('cart-items-el'),footer=document.getElementById('cart-footer-el');
+  if(!cart.length){list.innerHTML=`<div class="cart-empty">${t('cart_empty')}</div>`;footer.style.display='none';return;}
+  // Группируем одинаковые товары
+  const groups={};
+  cart.forEach(p=>{
+    if(groups[p.id]){groups[p.id].count++;groups[p.id].cids.push(p.cid);}
+    else{groups[p.id]={...p,count:1,cids:[p.cid]};}
+  });
+  list.innerHTML=Object.values(groups).map(p=>`
+    <div class="cart-item">
+      <div class="ci-thumb">${p.photo?`<img src="${p.photo}" alt="">`:(p.emoji||'🎮')}</div>
+      <div class="ci-info">
+        <div class="ci-name">${p.name}${p.count>1?` <span style="background:var(--accent);color:#fff;border-radius:20px;padding:1px 8px;font-size:12px">x${p.count}</span>`:''}</div>
+        <div class="ci-price">${formatPrice(p.price*p.count)}</div>
+      </div>
+      <button class="ci-remove" onclick="removeFromCartById('${p.id}')">✕</button>
+    </div>`).join('');
+  document.getElementById('cart-total-el').textContent=formatPrice(cart.reduce((s,x)=>s+x.price,0));
+  footer.style.display='block';
+}
+function removeFromCartById(id){
+  // Удаляем один экземпляр товара
+  const idx=cart.findIndex(x=>x.id==id);
+  if(idx>=0){cart.splice(idx,1);updateCartUI();renderCartItems();}
+}
+
+// ── CHECKOUT ──
+function openCheckout(){
+  closeCart();
+  const total=cart.reduce((s,x)=>s+x.price,0);
+  document.getElementById('order-summary-el').innerHTML=
+    `<strong>Товары:</strong> ${cart.map(x=>x.name).join(', ')}<br><strong style="color:var(--gold)">${t('cart_total')} ${formatPrice(total)}</strong>`;
+
+  // Автозаполнение игры из корзины
+  const gameMap={rb:'Roblox',bs:'Brawl Stars',cr:'Clash Royale',coc:'Clash of Clans'};
+  if(cart.length>0){
+    const firstGame=cart[0].game;
+    const gameName=gameMap[firstGame]||'';
+    document.getElementById('f-game').value=gameName;
+    document.getElementById('f-game-display').textContent=gameName;
+  }
+
+  document.getElementById('checkout-modal').classList.add('open');
+}
+function closeCheckout(){document.getElementById('checkout-modal').classList.remove('open');}
+function validateTg(input){
+  const val=input.value;
+  const hint=document.getElementById('tg-hint');
+  // Must start with @ and contain only letters, digits, underscore, min 5 chars total
+  if(val.length===0){hint.style.display='none';return;}
+  const valid=/^@[a-zA-Z0-9_]{4,}$/.test(val);
+  hint.style.display=valid?'none':'block';
+  input.style.borderColor=valid?'var(--accent)':'var(--rb)';
+}
+
+function copyCard(){
+  navigator.clipboard.writeText('4400430203420077').then(()=>{
+    const btn=document.getElementById('copy-card-btn');
+    btn.textContent='✅ Скопировано!';
+    setTimeout(()=>btn.textContent='📋 Скопировать',2000);
+  });
+}
+
+async function submitOrder(){
+  const nm=document.getElementById('f-name').value.trim();
+  const tg=document.getElementById('f-tg').value.trim();
+  const nk=document.getElementById('f-nick').value.trim();
+  const gm=document.getElementById('f-game').value;
+  if(!nm||!tg||!nk){toast('⚠️ '+t('toast_fill'));return;}
+  if(!/^@[a-zA-Z0-9_]{4,}$/.test(tg)){toast('⚠️ Введите корректный Telegram: @username');return;}
+
+  const BOT_TOKEN='8636502910:AAGLeqt3pLKnjs2Cn0jUfQjYZ6L8NCXK58g';
+  const CHAT_ID='5804299248';
+  const total=cart.reduce((s,x)=>s+x.price,0);
+  const items=cart.map(x=>x.name).join(', ');
+  const text=
+    `🛒 *Новый заказ — Spike\\_shop*\n\n`+
+    `👤 Имя: ${nm}\n`+
+    `📱 Telegram: ${tg}\n`+
+    `🎮 ID: ${nk}\n`+
+    `🕹 Игра: ${gm}\n`+
+    `📦 Товары: ${items}\n`+
+    `💰 Сумма: ${formatPrice(total)}\n`+
+    `🕐 Время: ${new Date().toLocaleString('ru')}\n\n`+
+    `💳 Ждём оплату на карту: 4400 4302 0342 0077`;
+
+  try{
+    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chat_id:CHAT_ID,text,parse_mode:'Markdown'})
+    });
+  }catch(e){console.error('Telegram error:',e);}
+
+  // Show total in success screen
+  document.getElementById('success-total').textContent=formatPrice(total);
+
+  D.orders.unshift({id:uid(),time:new Date().toLocaleString('ru'),name:nm,tg,nick:nk,game:gm,items:cart.map(x=>x.name),total,currency:currentCurrency,status:'new'});
+  save();closeCheckout();cart=[];updateCartUI();
+  document.getElementById('success-modal').classList.add('open');
+}
+
+// ── FAQ ──
+function renderFaq(){
+  document.getElementById('faq-list').innerHTML=D.faq.map(f=>`
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">${f.q}<span class="faq-arrow">▼</span></div>
+      <div class="faq-a"><div class="faq-a-inner">${f.a}</div></div>
+    </div>`).join('');
+}
+
+// ── ADMIN ──
+function openAdminLogin(){document.getElementById('admin-login').classList.add('show');setTimeout(()=>document.getElementById('admin-pass-input').focus(),100);}
+function closeAdminLogin(){document.getElementById('admin-login').classList.remove('show');}
+function checkPass(){
+  if(document.getElementById('admin-pass-input').value===D.pass){closeAdminLogin();openAdmin();}
+  else{toast('❌ '+t('toast_wrong_pass'));document.getElementById('admin-pass-input').value='';}
+}
+function openAdmin(){
+  document.getElementById('admin-overlay').classList.add('open');
+  renderAdminProducts();renderAdminFaq();loadSettings();
+}
+function closeAdmin(){document.getElementById('admin-overlay').classList.remove('open');}
+function showTab(id,btn){
+  document.querySelectorAll('.a-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.a-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');btn.classList.add('active');
+}
+
+function renderAdminProducts(){
+  document.getElementById('admin-prod-list').innerHTML=D.products.map(p=>{
+    const inStock=p.inStock!==false;
+    return `
+    <div class="prod-row">
+      <div class="prod-thumb">${p.photo?`<img src="${p.photo}" alt="">`:(p.emoji||'🎮')}</div>
+      <div class="prod-info">
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-meta">${gameName[p.game]} · ${p.price} ₽${p.badge?' · '+p.badge:''}
+          <span style="margin-left:6px;font-weight:700;color:${inStock?'#4ade80':'#f87171'}">${inStock?'✅ В наличии':'🚫 Нет в наличии'}</span>
+        </div>
+      </div>
+      <div class="prod-actions">
+        <button class="btn-edit" style="background:${inStock?'rgba(74,222,128,.1)':'rgba(244,63,94,.1)'};border-color:${inStock?'rgba(74,222,128,.25)':'rgba(244,63,94,.25)'};color:${inStock?'#86efac':'#fda4af'}" onclick="toggleStock(${p.id})">${inStock?'📦 Убрать':'✅ Вернуть'}</button>
+        <button class="btn-edit" onclick="openProdForm(${p.id})">✏️ Изм.</button>
+        <button class="btn-del"  onclick="deleteProd(${p.id})">🗑</button>
+      </div>
+    </div>`;
+  }).join('')||'<div style="color:var(--muted);padding:1rem;text-align:center">Товаров нет</div>';
+}
+function toggleStock(id){
+  const p=D.products.find(x=>x.id===id);if(!p)return;
+  p.inStock=p.inStock===false?true:false;
+  save();sheetsSave();renderProducts();renderAdminProducts();
+  toast(p.inStock?'✅ Товар в наличии':'🚫 Товар убран из наличия');
+}
+function openProdForm(id){
+  editProdId=id||null;resetPhoto();
+  const form=document.getElementById('prod-form');form.style.display='block';
+  form.scrollIntoView({behavior:'smooth',block:'nearest'});
+  if(id){
+    const p=D.products.find(x=>x.id===id);
+    document.getElementById('pf-title-el').textContent='✏️ '+p.name;
+    document.getElementById('pf-name').value=p.name;
+    document.getElementById('pf-game').value=p.game;
+    document.getElementById('pf-price').value=p.price;
+    document.getElementById('pf-oldprice').value=p.oldPrice||'';
+    document.getElementById('pf-emoji').value=p.emoji||'';
+    document.getElementById('pf-badge').value=p.badge||'';
+    document.getElementById('pf-desc').value=p.desc||'';
+    document.getElementById('pf-desc-en').value=p.desc_en||'';
+    document.getElementById('pf-desc-kz').value=p.desc_kz||'';
+    if(p.photo)setPhotoPreview(p.photo);
+  }else{
+    document.getElementById('pf-title-el').textContent='➕ '+t('btn_add_prod');
+    ['pf-name','pf-price','pf-oldprice','pf-desc','pf-desc-en','pf-desc-kz'].forEach(i=>document.getElementById(i).value='');
+    document.getElementById('pf-game').value='rb';
+    document.getElementById('pf-emoji').value='💎';
+    document.getElementById('pf-badge').value='';
+  }
+}
+function closeProdForm(){document.getElementById('prod-form').style.display='none';editProdId=null;resetPhoto();}
+const IMGBB_KEY = '8ac2ce1891876d3e3ed001d0bea5ff24';
+
+async function uploadToImgBB(base64){
+  try {
+    toast('⏳ Загружаю фото в облако...');
+    const formData = new FormData();
+    formData.append('key', IMGBB_KEY);
+    formData.append('image', base64.split(',')[1]);
+    const res = await fetch('https://api.imgbb.com/1/upload', {method:'POST', body:formData});
+    const json = await res.json();
+    if(json.success){
+      toast('✅ Фото загружено!');
+      return json.data.url;
+    } else {
+      toast('⚠️ Ошибка загрузки фото');
+      return base64;
+    }
+  } catch(e) {
+    toast('⚠️ Нет интернета, фото сохранено локально');
+    return base64;
+  }
+}
+
+function handlePhoto(input){
+  const file=input.files[0];if(!file)return;
+  if(file.size>5*1024*1024){toast('⚠️ '+t('toast_big_file'));return;}
+  const reader=new FileReader();
+  photoUploadDone = false;
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=async function(){
+      const MAX=800;
+      let w=img.width, h=img.height;
+      if(w>MAX||h>MAX){
+        if(w>h){h=Math.round(h*MAX/w);w=MAX;}
+        else{w=Math.round(w*MAX/h);h=MAX;}
+      }
+      const canvas=document.createElement('canvas');
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const compressed=canvas.toDataURL('image/jpeg',0.85);
+      // Сначала показываем локально сразу
+      setPhotoPreview(compressed);
+      // Потом загружаем в облако и обновляем ссылку
+      const cloudUrl = await uploadToImgBB(compressed);
+      if(cloudUrl !== compressed) setPhotoPreview(cloudUrl);
+      photoUploadDone = true;
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function setPhotoPreview(src){
+  currentPhoto=src;
+  const prev=document.getElementById('pf-preview');prev.src=src;prev.style.display='block';
+  document.getElementById('btn-clear-photo').style.display='inline-block';
+  document.getElementById('pz-icon').style.display='none';
+  document.getElementById('pz-text').style.display='none';
+  document.getElementById('photo-zone').classList.add('filled');
+}
+function resetPhoto(){
+  currentPhoto=null;
+  document.getElementById('pf-preview').style.display='none';
+  document.getElementById('pf-preview').src='';
+  document.getElementById('btn-clear-photo').style.display='none';
+  document.getElementById('pz-icon').style.display='block';
+  document.getElementById('pz-text').style.display='block';
+  document.getElementById('photo-zone').classList.remove('filled');
+  document.getElementById('pf-photo-input').value='';
+}
+function clearPhoto(e){e.stopPropagation();resetPhoto();}
+async function saveProduct(){
+  const name=document.getElementById('pf-name').value.trim();
+  const price=parseFloat(document.getElementById('pf-price').value);
+  if(!name||!price){toast('⚠️ '+t('toast_fill_prod'));return;}
+  // Ждём загрузки фото на ImgBB если она ещё идёт
+  if(currentPhoto && currentPhoto.startsWith('data:') && !photoUploadDone){
+    toast('⏳ Подождите, фото ещё загружается...');
+    let attempts=0;
+    while(currentPhoto && currentPhoto.startsWith('data:') && attempts<30){
+      await new Promise(r=>setTimeout(r,500));
+      attempts++;
+    }
+  }
+  const existingProd=editProdId?D.products.find(x=>x.id===editProdId):null;
+  const p={id:editProdId||uid(),name,price,game:document.getElementById('pf-game').value,oldPrice:parseFloat(document.getElementById('pf-oldprice').value)||null,emoji:document.getElementById('pf-emoji').value.trim()||'🎮',badge:document.getElementById('pf-badge').value||null,desc:document.getElementById('pf-desc').value.trim(),desc_en:document.getElementById('pf-desc-en').value.trim(),desc_kz:document.getElementById('pf-desc-kz').value.trim(),photo:currentPhoto||null,inStock:existingProd?existingProd.inStock!==false:true};
+  if(editProdId){const i=D.products.findIndex(x=>x.id===editProdId);if(i>=0)D.products[i]=p;else D.products.push(p);}
+  else D.products.push(p);
+  save();sheetsSave();renderProducts();renderAdminProducts();closeProdForm();toast('✅ '+t('toast_saved'));
+}
+function deleteProd(id){
+  if(!confirm('Удалить?'))return;
+  D.products=D.products.filter(x=>x.id!==id);
+  save();sheetsSave();renderProducts();renderAdminProducts();toast('🗑 '+t('toast_deleted'));
+}
+
+function loadSettings(){
+  const s=D.settings;
+  document.getElementById('s-name').value=s.name||'';
+  document.getElementById('s-badge').value=s.badge||'';
+  document.getElementById('s-sub').value=s.sub||'';
+  document.getElementById('s-tg').value=s.tg||'';
+  document.getElementById('s-email').value=s.email||'';
+  document.getElementById('s-stat3').value=s.stat3||'';
+}
+function saveSettings(){
+  D.settings={name:document.getElementById('s-name').value.trim()||'Spike_shop',badge:document.getElementById('s-badge').value.trim(),sub:document.getElementById('s-sub').value.trim(),tg:document.getElementById('s-tg').value.trim(),email:document.getElementById('s-email').value.trim(),stat3:document.getElementById('s-stat3').value.trim()};
+  const p1=document.getElementById('s-pass1').value;
+  const p2=document.getElementById('s-pass2').value;
+  if(p1){
+    if(p1!==p2){toast('⚠️ '+t('toast_pass_mismatch'));return;}
+    if(p1.length<4){toast('⚠️ '+t('toast_pass_short'));return;}
+    D.pass=p1;document.getElementById('s-pass1').value='';document.getElementById('s-pass2').value='';toast('🔐 '+t('toast_pass_changed'));
+  }
+  save();applySettings();toast('✅ '+t('toast_settings'));
+}
+
+function renderAdminFaq(){
+  document.getElementById('faq-admin-list').innerHTML=D.faq.map(f=>`
+    <div class="faq-row">
+      <div class="faq-row-texts"><div class="faq-row-q">❓ ${f.q}</div><div class="faq-row-a">${f.a}</div></div>
+      <div class="faq-row-actions">
+        <button class="btn-edit" onclick="openFaqForm(${f.id})">✏️</button>
+        <button class="btn-del"  onclick="deleteFaq(${f.id})">🗑</button>
+      </div>
+    </div>`).join('')||'<div style="color:var(--muted);padding:1rem;text-align:center">Вопросов нет</div>';
+}
+function openFaqForm(id){
+  editFaqId=id||null;
+  document.getElementById('faq-form').style.display='block';
+  if(id){const f=D.faq.find(x=>x.id===id);document.getElementById('faq-q-in').value=f.q;document.getElementById('faq-a-in').value=f.a;}
+  else{document.getElementById('faq-q-in').value='';document.getElementById('faq-a-in').value='';}
+}
+function closeFaqForm(){document.getElementById('faq-form').style.display='none';editFaqId=null;}
+function saveFaq(){
+  const q=document.getElementById('faq-q-in').value.trim();
+  const a=document.getElementById('faq-a-in').value.trim();
+  if(!q||!a){toast('⚠️ '+t('toast_fill_faq'));return;}
+  if(editFaqId){const f=D.faq.find(x=>x.id===editFaqId);if(f){f.q=q;f.a=a;}}
+  else D.faq.push({id:uid(),q,a});
+  save();renderFaq();renderAdminFaq();closeFaqForm();toast('✅ FAQ сохранён');
+}
+function deleteFaq(id){
+  if(!confirm('Удалить?'))return;
+  D.faq=D.faq.filter(x=>x.id!==id);save();renderFaq();renderAdminFaq();
+}
+
+function renderAdminOrders(){
+  const el=document.getElementById('orders-list-el');
+  if(!D.orders.length){el.innerHTML=`<div class="no-orders">${t('no_orders')}</div>`;return;}
+  el.innerHTML=D.orders.map(o=>`
+    <div class="order-row">
+      <div class="order-header">
+        <div class="order-id">#${String(o.id).slice(-6)} — ${o.name}</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span class="order-status ${o.status==='done'?'status-done':'status-new'}">${o.status==='done'?'✅ Выполнен':'🔔 Новый'}</span>
+          ${o.status!=='done'?`<button class="btn-edit" style="font-size:11px;padding:4px 10px" onclick="doneOrder(${o.id})">${t('done_btn')}</button>`:''}
+        </div>
+      </div>
+      <div class="order-details">
+        📧 ${o.contact} · 🎮 ${o.nick} · ${o.game}<br>
+        💳 ${o.pay} · ${o.items.join(', ')}<br>
+        💰 <strong>${o.total} ₽ (${o.currency||'RUB'})</strong> · 🕐 ${o.time}
+      </div>
+    </div>`).join('');
+}
+function doneOrder(id){
+  const o=D.orders.find(x=>x.id===id);if(o){o.status='done';save();renderAdminOrders();toast('✅ '+t('order_done'));}
+}
+
+// ── INIT ──
+applySettings();
+applyLang();
+renderProducts();
+renderFaq();
+sheetsGet();
+
+setInterval(sheetsGet, 10000);
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') sheetsGet();
+});
+
+// ── BG LOGO ──
+(function(){
+  const logoEl = document.createElement('div');
+  const isMobile = window.innerWidth < 600;
+  logoEl.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-15deg);pointer-events:none;z-index:0;user-select:none;white-space:nowrap;font-family:Syne,sans-serif;font-weight:800;font-size:' + (isMobile ? 'clamp(20px,9vw,48px)' : 'clamp(50px,8vw,110px)') + ';letter-spacing:-2px;color:transparent;-webkit-text-stroke:' + (isMobile ? '1px rgba(124,58,237,0.5)' : '1px rgba(124,58,237,0.35)') + ';text-align:center;line-height:1;opacity:1;width:100vw;overflow:hidden';
+  window.addEventListener('resize', () => {
+    const m = window.innerWidth < 600;
+    logoEl.style.fontSize = m ? 'clamp(20px,9vw,48px)' : 'clamp(50px,8vw,110px)';
+    logoEl.style.webkitTextStroke = m ? '1px rgba(124,58,237,0.5)' : '1px rgba(124,58,237,0.35)';
+  });
+  logoEl.innerHTML = 'Spike<span style="-webkit-text-stroke:1px rgba(124,58,237,0.55);color:transparent">_shop</span>';
+  document.body.insertBefore(logoEl, document.body.firstChild);
+})();
+
+// ── FLOATING PARTICLES ──
+(function(){
+  const canvas = document.createElement('canvas');
+  canvas.id = 'particles-canvas';
+  document.body.insertBefore(canvas, document.body.firstChild);
+  const ctx = canvas.getContext('2d');
+
+  const EMOJIS = ['🎮','🕹️','🧱','💎','👑','⚔️','💥','🔥'];
+  const COUNT = window.innerWidth < 600 ? 14 : 26;
+
+  function resize(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const particles = Array.from({length: COUNT}, () => ({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    emoji: EMOJIS[Math.floor(Math.random() * EMOJIS.length)],
+    size: 9 + Math.random() * 10,
+    vx: (Math.random() - 0.5) * 0.45,
+    vy: -0.18 - Math.random() * 0.38,
+    alpha: 0.25 + Math.random() * 0.35,
+    rot: Math.random() * Math.PI * 2,
+    rotSpeed: (Math.random() - 0.5) * 0.012,
+    pulse: Math.random() * Math.PI * 2,
+    pulseSpeed: 0.012 + Math.random() * 0.018
+  }));
+
+  function draw(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.rotSpeed;
+      p.pulse += p.pulseSpeed;
+      if(p.y < -40){ p.y = canvas.height + 20; p.x = Math.random() * canvas.width; }
+      if(p.x < -40) p.x = canvas.width + 20;
+      if(p.x > canvas.width + 40) p.x = -20;
+      const alphaVal = p.alpha * (0.7 + 0.3 * Math.sin(p.pulse));
+      ctx.save();
+      ctx.globalAlpha = alphaVal;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.font = p.size + 'px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(p.emoji, 0, 0);
+      ctx.restore();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+</body>
+</html>
