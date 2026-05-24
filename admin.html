@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spike_shop вЂ” РђРґРјРёРЅРєР°</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--accent:#7c3aed;--accent2:#6d28d9;--glow:rgba(124,58,237,.35);--bg:#08080f;--bg2:#0f0f1a;--bg3:#161625;--border:rgba(255,255,255,.06);--border2:rgba(124,58,237,.2);--text:#f1f0ff;--muted:#666680;--gold:#e8c840;--rb:#f43f5e;--bs:#8b5cf6;--cr:#0ea5e9;--coc:#22c55e}
+html{scroll-behavior:smooth}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px;max-width:1000px;margin:0 auto}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--accent2);border-radius:99px}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.header h1{font-family:'Syne',sans-serif;font-size:1.6rem}
+.header h1 span{color:var(--accent)}
+.header a{color:var(--muted);text-decoration:none;font-size:13px;padding:8px 16px;border:1px solid var(--border);border-radius:8px;transition:all .2s}
+.header a:hover{color:var(--text);border-color:var(--border2)}
+.tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:4px;overflow-x:auto}
+.tab{background:transparent;border:none;border-bottom:2px solid transparent;padding:10px 18px;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s}
+.tab:hover{color:#ccc}
+.tab.active{color:var(--text);border-color:var(--accent)}
+.section{display:none}
+.section.active{display:block}
+.s-title{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:4px}
+.s-sub{color:var(--muted);font-size:13px;margin-bottom:16px}
+/* Products */
+.prod-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.prod-row{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 15px;display:flex;align-items:center;gap:13px}
+.prod-thumb{width:48px;height:48px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:1.7rem;flex-shrink:0;overflow:hidden}
+.prod-thumb img{width:100%;height:100%;object-fit:cover}
+.prod-info{flex:1;min-width:0}
+.prod-name{font-weight:700;font-size:14px;margin-bottom:2px}
+.prod-meta{font-size:12px;color:var(--muted)}
+.prod-actions{display:flex;gap:7px;flex-shrink:0}
+.btn-edit{background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);border-radius:7px;padding:5px 12px;color:#7dd3fc;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
+.btn-del{background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.2);border-radius:7px;padding:5px 12px;color:#fda4af;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
+.btn-add{background:var(--accent);border:none;border-radius:10px;padding:11px 22px;color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 0 16px var(--glow)}
+.prod-form{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:1.4rem;margin-top:1rem;display:none}
+.prod-form-title{font-weight:700;font-size:15px;margin-bottom:1.2rem}
+.pf-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.pf-field{display:flex;flex-direction:column;gap:5px}
+.pf-field.full{grid-column:1/-1}
+.pf-field label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.pf-field input,.pf-field select,.pf-field textarea{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:9px;padding:9px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;resize:vertical;transition:border-color .2s}
+.pf-field input:focus,.pf-field select:focus,.pf-field textarea:focus{border-color:var(--accent)}
+.pf-actions{display:flex;gap:10px;margin-top:8px}
+.btn-save{background:var(--accent);border:none;border-radius:9px;padding:10px 22px;color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 0 14px var(--glow)}
+.btn-cancel{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:9px;padding:10px 18px;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;cursor:pointer}
+/* Settings */
+.s-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.s-field{display:flex;flex-direction:column;gap:5px}
+.s-field.full{grid-column:1/-1}
+.s-field label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.s-field input,.s-field select{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px 13px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+.s-field input:focus{border-color:var(--accent)}
+.s-divider{grid-column:1/-1;height:1px;background:var(--border)}
+.btn-save-settings{background:var(--accent);border:none;border-radius:10px;padding:11px 26px;color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-top:1.2rem;box-shadow:0 0 14px var(--glow)}
+/* FAQ */
+.faq-admin-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.faq-row{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:12px}
+.faq-row-texts{flex:1}
+.faq-row-q{font-weight:600;font-size:13px;margin-bottom:3px}
+.faq-row-a{font-size:12px;color:var(--muted)}
+.faq-row-actions{display:flex;gap:7px;flex-shrink:0}
+.faq-form{background:var(--bg2);border:1px solid var(--border2);border-radius:13px;padding:1.2rem;display:none;margin-bottom:1rem}
+.faq-form-fields{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.faq-form-fields label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px}
+.faq-form-fields input,.faq-form-fields textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:9px;padding:9px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;resize:vertical}
+.faq-form-fields input:focus,.faq-form-fields textarea:focus{border-color:var(--accent)}
+/* Orders */
+.orders-list{display:flex;flex-direction:column;gap:10px}
+.order-row{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:13px 15px}
+.order-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;flex-wrap:wrap;gap:8px}
+.order-id{font-weight:700;font-size:14px}
+.order-details{font-size:13px;color:#aaa;line-height:1.7}
+.order-status{font-size:11px;font-weight:600;border-radius:6px;padding:3px 9px}
+.status-new{background:rgba(124,58,237,.12);color:#a78bfa}
+.status-done{background:rgba(34,197,94,.1);color:#86efac}
+.no-orders{text-align:center;padding:3rem;color:var(--muted);font-size:14px}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:11px 22px;border-radius:50px;font-size:14px;font-weight:600;transition:transform .3s;z-index:500;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+@media(max-width:768px){.pf-grid,.s-grid{grid-template-columns:1fr}.pf-field.full,.s-field.full{grid-column:auto}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>вљ™пёЏ <span>Spike_shop</span> вЂ” СЂРµРґР°РєС‚РѕСЂ</h1>
+  <a href="index.html">в†ђ РќР° СЃР°Р№С‚</a>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('tab-products',this)">рџ›ЌпёЏ РўРѕРІР°СЂС‹</button>
+  <button class="tab" onclick="showTab('tab-settings',this)">вљ™пёЏ РќР°СЃС‚СЂРѕР№РєРё</button>
+  <button class="tab" onclick="showTab('tab-faq',this)">вќ“ FAQ</button>
+  <button class="tab" onclick="showTab('tab-orders',this);renderAdminOrders()">рџ“‹ Р—Р°РєР°Р·С‹</button>
+</div>
+
+<!-- TABS CONTENT -->
+<div class="section active" id="tab-products">
+  <div class="s-title">рџ›ЌпёЏ РЈРїСЂР°РІР»РµРЅРёРµ С‚РѕРІР°СЂР°РјРё</div>
+  <div class="s-sub">Р”РѕР±Р°РІР»СЏР№, СЂРµРґР°РєС‚РёСЂСѓР№, СѓРґР°Р»СЏР№ С‚РѕРІР°СЂС‹</div>
+  <div class="prod-list" id="admin-prod-list"></div>
+  <button class="btn-add" onclick="openProdForm()">+ Р”РѕР±Р°РІРёС‚СЊ С‚РѕРІР°СЂ</button>
+  <div class="prod-form" id="prod-form">
+    <div class="prod-form-title" id="pf-title-el">вћ• РќРѕРІС‹Р№ С‚РѕРІР°СЂ</div>
+    <div class="pf-grid">
+      <div class="pf-field"><label>РќР°Р·РІР°РЅРёРµ</label><input id="pf-name" type="text" placeholder="Robux 400"></div>
+      <div class="pf-field"><label>РРіСЂР°</label>
+        <select id="pf-game"><option value="rb">Roblox</option><option value="bs">Brawl Stars</option><option value="cr">Clash Royale</option><option value="coc">Clash of Clans</option></select>
+      </div>
+      <div class="pf-field"><label>Р¦РµРЅР° (в‚Ѕ)</label><input id="pf-price" type="number" placeholder="299"></div>
+      <div class="pf-field"><label>РЎС‚Р°СЂР°СЏ С†РµРЅР°</label><input id="pf-oldprice" type="number"></div>
+      <div class="pf-field"><label>Р­РјРѕРґР·Рё</label><input id="pf-emoji" type="text" placeholder="рџ’Ћ"></div>
+      <div class="pf-field"><label>Р‘РµР№РґР¶</label>
+        <select id="pf-badge"><option value="">Р‘РµР· Р±РµР№РґР¶Р°</option><option value="hot">рџ”Ґ РҐРёС‚</option><option value="sale">рџ’ё РЎРєРёРґРєР°</option><option value="new">вњЁ РќРѕРІРёРЅРєР°</option></select>
+      </div>
+      <div class="pf-field full"><label>РћРїРёСЃР°РЅРёРµ (RU)</label><textarea id="pf-desc" rows="2"></textarea></div>
+      <div class="pf-field full"><label>РћРїРёСЃР°РЅРёРµ (EN)</label><textarea id="pf-desc-en" rows="2"></textarea></div>
+      <div class="pf-field full"><label>РЎРёРїР°С‚С‚Р°РјР° (KZ)</label><textarea id="pf-desc-kz" rows="2"></textarea></div>
+      <div class="pf-actions full">
+        <button class="btn-save" onclick="saveProduct()">рџ’ѕ РЎРѕС…СЂР°РЅРёС‚СЊ</button>
+        <button class="btn-cancel" onclick="closeProdForm()">РћС‚РјРµРЅР°</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="tab-settings">
+  <div class="s-title">вљ™пёЏ РќР°СЃС‚СЂРѕР№РєРё СЃР°Р№С‚Р°</div>
+  <div class="s-sub">РњРµРЅСЏР№ РЅР°Р·РІР°РЅРёРµ, РєРѕРЅС‚Р°РєС‚С‹ Рё РїР°СЂРѕР»СЊ</div>
+  <div class="s-grid">
+    <div class="s-field"><label>РќР°Р·РІР°РЅРёРµ РјР°РіР°Р·РёРЅР°</label><input id="s-name" type="text" placeholder="Spike_shop"></div>
+    <div class="s-field"><label>Р‘РµР№РґР¶ РІ С€Р°РїРєРµ</label><input id="s-badge" type="text"></div>
+    <div class="s-field full"><label>РћРїРёСЃР°РЅРёРµ</label><input id="s-sub" type="text"></div>
+    <div class="s-field"><label>Telegram</label><input id="s-tg" type="text" placeholder="https://t.me/..."></div>
+    <div class="s-field"><label>Email</label><input id="s-email" type="text"></div>
+    <div class="s-field"><label>Р’СЂРµРјСЏ РґРѕСЃС‚Р°РІРєРё</label><input id="s-stat3" type="text" placeholder="5вЂ“15 РјРёРЅ"></div>
+    <div class="s-divider"></div>
+    <div class="s-field"><label>РќРѕРІС‹Р№ РїР°СЂРѕР»СЊ</label><input id="s-pass1" type="password" placeholder="РћСЃС‚Р°РІСЊ РїСѓСЃС‚С‹Рј вЂ” Р±РµР· РёР·РјРµРЅРµРЅРёР№"></div>
+    <div class="s-field"><label>РџРѕРІС‚РѕСЂРё РїР°СЂРѕР»СЊ</label><input id="s-pass2" type="password"></div>
+  </div>
+  <button class="btn-save-settings" onclick="saveSettings()">рџ’ѕ РЎРѕС…СЂР°РЅРёС‚СЊ РЅР°СЃС‚СЂРѕР№РєРё</button>
+</div>
+
+<div class="section" id="tab-faq">
+  <div class="s-title">вќ“ FAQ</div>
+  <div class="s-sub">РЈРїСЂР°РІР»СЏР№ РІРѕРїСЂРѕСЃР°РјРё Рё РѕС‚РІРµС‚Р°РјРё</div>
+  <div class="faq-form" id="faq-form">
+    <div class="faq-form-fields">
+      <div><label>Р’РѕРїСЂРѕСЃ</label><input id="faq-q-in" type="text" placeholder="РљР°Рє Р±С‹СЃС‚СЂРѕ РїСЂРёРґС‘С‚ С‚РѕРІР°СЂ?"></div>
+      <div><label>РћС‚РІРµС‚</label><textarea id="faq-a-in" rows="3" placeholder="РџРѕРґСЂРѕР±РЅС‹Р№ РѕС‚РІРµС‚..."></textarea></div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn-save" onclick="saveFaq()">рџ’ѕ РЎРѕС…СЂР°РЅРёС‚СЊ</button>
+      <button class="btn-cancel" onclick="closeFaqForm()">РћС‚РјРµРЅР°</button>
+    </div>
+  </div>
+  <div class="faq-admin-list" id="faq-admin-list"></div>
+  <button class="btn-add" onclick="openFaqForm()">+ Р”РѕР±Р°РІРёС‚СЊ РІРѕРїСЂРѕСЃ</button>
+</div>
+
+<div class="section" id="tab-orders">
+  <div class="s-title">рџ“‹ Р—Р°РєР°Р·С‹</div>
+  <div class="s-sub">Р’СЃРµ РІС…РѕРґСЏС‰РёРµ Р·Р°РєР°Р·С‹ РѕС‚ РїРѕРєСѓРїР°С‚РµР»РµР№</div>
+  <div class="orders-list" id="orders-list-el"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY = 'spikeshop_v1';
+function defaults() {
+  return {
+    pass: 'plmokniuy1661',
+    settings: { name: 'Spike_shop', badge: 'Р›СѓС‡С€РёР№ РёРіСЂРѕРІРѕР№ РјР°РіР°Р·РёРЅ 2025', sub: 'Roblox, Brawl Stars, Clash Royale, Clash of Clans вЂ” РїРѕРєСѓРїР°Р№ РІР°Р»СЋС‚Сѓ, РїСЂРѕРїСѓСЃРєРё Рё РїСЂРµРґРјРµС‚С‹ Р±С‹СЃС‚СЂРѕ Рё РІС‹РіРѕРґРЅРѕ.', tg: 'https://t.me/spikeshop', email: 'info@spikeshop.ru', stat3: '5вЂ“15 РјРёРЅ' },
+    products: [
+      { id: 1, name: 'Robux 400', game: 'rb', price: 299, oldPrice: null, emoji: 'рџ’Ћ', badge: 'hot', desc: '400 Robux РЅР° Р°РєРєР°СѓРЅС‚', photo: null, inStock: true },
+      { id: 2, name: 'Robux 800', game: 'rb', price: 549, oldPrice: null, emoji: 'рџ’Ћ', badge: null, desc: '800 Robux РЅР° Р°РєРєР°СѓРЅС‚', photo: null, inStock: true },
+      { id: 3, name: 'Robux 1700', game: 'rb', price: 999, oldPrice: 1199, emoji: 'рџ‘‘', badge: 'sale', desc: 'Р’С‹РіРѕРґРЅС‹Р№ РїР°Рє Robux', photo: null, inStock: true },
+      { id: 4, name: 'Р“РµРјС‹ 80', game: 'bs', price: 149, oldPrice: null, emoji: 'рџ’њ', badge: null, desc: '80 РіРµРјРѕРІ РІ Brawl Stars', photo: null, inStock: true },
+      { id: 5, name: 'Р“РµРјС‹ 360', game: 'bs', price: 529, oldPrice: 599, emoji: 'рџ’Ћ', badge: 'sale', desc: '360 РіРµРјРѕРІ вЂ” Р»СѓС‡С€Р°СЏ С†РµРЅР°', photo: null, inStock: true },
+      { id: 6, name: 'Brawl Pass', game: 'bs', price: 449, oldPrice: 549, emoji: 'рџЏ†', badge: 'sale', desc: 'Р‘РѕРµРІРѕР№ РїСЂРѕРїСѓСЃРє РЅР° СЃРµР·РѕРЅ', photo: null, inStock: true },
+      { id: 7, name: 'РЎР°РјРѕС†РІРµС‚С‹ 80', game: 'cr', price: 299, oldPrice: null, emoji: 'рџ’Ћ', badge: 'hot', desc: '80 СЃР°РјРѕС†РІРµС‚РѕРІ CR', photo: null, inStock: true },
+      { id: 8, name: 'Pass Royale', game: 'cr', price: 399, oldPrice: 499, emoji: 'рџ‘‘', badge: 'sale', desc: 'РљРѕСЂРѕР»РµРІСЃРєРёР№ РїСЂРѕРїСѓСЃРє', photo: null, inStock: true },
+      { id: 9, name: 'Р“РµРјС‹ 500', game: 'coc', price: 399, oldPrice: null, emoji: 'рџ’Ћ', badge: 'hot', desc: '500 РіРµРјРѕРІ CoC', photo: null, inStock: true },
+      { id: 10, name: 'Р“РµРјС‹ 1200', game: 'coc', price: 849, oldPrice: 999, emoji: 'рџ’Ћ', badge: 'sale', desc: '1200 РіРµРјРѕРІ вЂ” Р±РѕР»СЊС€РѕР№ РїР°Рє', photo: null, inStock: true },
+    ],
+    faq: [
+      { id: 1, q: 'РљР°Рє Р±С‹СЃС‚СЂРѕ СЏ РїРѕР»СѓС‡Сѓ С‚РѕРІР°СЂ?', a: 'РџРѕСЃР»Рµ РѕРїР»Р°С‚С‹ РѕС‚РїСЂР°РІР»СЏРµРј РІ С‚РµС‡РµРЅРёРµ 5вЂ“15 РјРёРЅСѓС‚. РћР±С‹С‡РЅРѕ РјРіРЅРѕРІРµРЅРЅРѕ!' },
+      { id: 2, q: 'РљР°РєРёРµ СЃРїРѕСЃРѕР±С‹ РѕРїР»Р°С‚С‹ РІС‹ РїСЂРёРЅРёРјР°РµС‚Рµ?', a: 'РљР°СЂС‚С‹, Kaspi Pay, Р®Money, РЎР‘Р•Р , PayPal. РџРёС€РёС‚Рµ РІ Telegram.' },
+      { id: 3, q: 'Р‘РµР·РѕРїР°СЃРЅРѕ Р»Рё СЌС‚Рѕ?', a: 'Р”Р°! РўРѕР»СЊРєРѕ РѕС„РёС†РёР°Р»СЊРЅС‹Рµ РјРµС‚РѕРґС‹. РџР°СЂРѕР»СЊ РЅРµ РїСЂРѕСЃРёРј вЂ” С‚РѕР»СЊРєРѕ РЅРёРє.' },
+      { id: 4, q: 'Р§С‚Рѕ РµСЃР»Рё С‡С‚Рѕ-С‚Рѕ РїРѕС€Р»Рѕ РЅРµ С‚Р°Рє?', a: 'РќР°РїРёС€РёС‚Рµ РЅР°Рј вЂ” СЂР°Р·Р±РµСЂС‘РјСЃСЏ РІ С‚РµС‡РµРЅРёРµ С‡Р°СЃР°!' },
+    ],
+    orders: []
+  };
+}
+function load() { try { const r = localStorage.getItem(KEY); return r ? { ...defaults(), ...JSON.parse(r) } : defaults(); } catch { return defaults(); } }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) { toast('вљ пёЏ РћС€РёР±РєР° СЃРѕС…СЂР°РЅРµРЅРёСЏ!'); } }
+
+let D = load();
+let editProdId = null, editFaqId = null;
+let uid = () => Date.now() + Math.floor(Math.random() * 9999);
+let toastT;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active'); btn.classList.add('active');
+}
+
+const gameName = { rb: 'Roblox', bs: 'Brawl Stars', cr: 'Clash Royale', coc: 'Clash of Clans' };
+
+// в”Ђв”Ђ PRODUCTS в”Ђв”Ђ
+function renderAdminProducts() {
+  document.getElementById('admin-prod-list').innerHTML = D.products.map(p => {
+    const inStock = p.inStock !== false;
+    return '<div class="prod-row">' +
+      '<div class="prod-thumb">' + (p.photo ? '<img src="' + p.photo + '" alt="">' : (p.emoji || 'рџЋ®')) + '</div>' +
+      '<div class="prod-info">' +
+      '<div class="prod-name">' + p.name + '</div>' +
+      '<div class="prod-meta">' + gameName[p.game] + ' В· ' + p.price + ' в‚Ѕ' + (p.badge ? ' В· ' + p.badge : '') +
+      ' <span style="margin-left:6px;font-weight:700;color:' + (inStock ? '#4ade80' : '#f87171') + '">' + (inStock ? 'вњ… Р’ РЅР°Р»РёС‡РёРё' : 'рџљ« РќРµС‚') + '</span></div>' +
+      '</div>' +
+      '<div class="prod-actions">' +
+      '<button class="btn-edit" style="background:' + (inStock ? 'rgba(74,222,128,.1)' : 'rgba(244,63,94,.1)') + ';border-color:' + (inStock ? 'rgba(74,222,128,.25)' : 'rgba(244,63,94,.25)') + ';color:' + (inStock ? '#86efac' : '#fda4af') + '" onclick="toggleStock(' + p.id + ')">' + (inStock ? 'рџ“¦ РЈР±СЂР°С‚СЊ' : 'вњ… Р’РµСЂРЅСѓС‚СЊ') + '</button>' +
+      '<button class="btn-edit" onclick="openProdForm(' + p.id + ')">вњЏпёЏ РР·Рј.</button>' +
+      '<button class="btn-del" onclick="deleteProd(' + p.id + ')">рџ—‘</button>' +
+      '</div></div>';
+  }).join('') || '<div style="color:var(--muted);padding:1rem;text-align:center">РўРѕРІР°СЂРѕРІ РЅРµС‚</div>';
+}
+
+function toggleStock(id) {
+  const p = D.products.find(x => x.id === id); if (!p) return;
+  p.inStock = p.inStock === false ? true : false;
+  save(); renderAdminProducts();
+  toast(p.inStock ? 'вњ… РўРѕРІР°СЂ РІ РЅР°Р»РёС‡РёРё' : 'рџљ« РўРѕРІР°СЂ СѓР±СЂР°РЅ');
+}
+
+function openProdForm(id) {
+  editProdId = id || null;
+  const form = document.getElementById('prod-form'); form.style.display = 'block';
+  form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  if (id) {
+    const p = D.products.find(x => x.id === id);
+    document.getElementById('pf-title-el').textContent = 'вњЏпёЏ ' + p.name;
+    document.getElementById('pf-name').value = p.name;
+    document.getElementById('pf-game').value = p.game;
+    document.getElementById('pf-price').value = p.price;
+    document.getElementById('pf-oldprice').value = p.oldPrice || '';
+    document.getElementById('pf-emoji').value = p.emoji || '';
+    document.getElementById('pf-badge').value = p.badge || '';
+    document.getElementById('pf-desc').value = p.desc || '';
+    document.getElementById('pf-desc-en').value = p.desc_en || '';
+    document.getElementById('pf-desc-kz').value = p.desc_kz || '';
+  } else {
+    document.getElementById('pf-title-el').textContent = 'вћ• РќРѕРІС‹Р№ С‚РѕРІР°СЂ';
+    ['pf-name', 'pf-price', 'pf-oldprice', 'pf-desc', 'pf-desc-en', 'pf-desc-kz'].forEach(i => document.getElementById(i).value = '');
+    document.getElementById('pf-game').value = 'rb';
+    document.getElementById('pf-emoji').value = 'рџ’Ћ';
+    document.getElementById('pf-badge').value = '';
+  }
+}
+
+function closeProdForm() { document.getElementById('prod-form').style.display = 'none'; editProdId = null; }
+
+function saveProduct() {
+  const name = document.getElementById('pf-name').value.trim();
+  const price = parseFloat(document.getElementById('pf-price').value);
+  if (!name || !price) { toast('вљ пёЏ Р’РІРµРґРёС‚Рµ РЅР°Р·РІР°РЅРёРµ Рё С†РµРЅСѓ'); return; }
+  const existing = editProdId ? D.products.find(x => x.id === editProdId) : null;
+  const p = {
+    id: editProdId || uid(), name, price,
+    game: document.getElementById('pf-game').value,
+    oldPrice: parseFloat(document.getElementById('pf-oldprice').value) || null,
+    emoji: document.getElementById('pf-emoji').value.trim() || 'рџЋ®',
+    badge: document.getElementById('pf-badge').value || null,
+    desc: document.getElementById('pf-desc').value.trim(),
+    desc_en: document.getElementById('pf-desc-en').value.trim(),
+    desc_kz: document.getElementById('pf-desc-kz').value.trim(),
+    photo: existing ? existing.photo : null,
+    inStock: existing ? existing.inStock !== false : true
+  };
+  if (editProdId) { const i = D.products.findIndex(x => x.id === editProdId); if (i >= 0) D.products[i] = p; else D.products.push(p); }
+  else D.products.push(p);
+  save(); renderAdminProducts(); closeProdForm(); toast('вњ… РўРѕРІР°СЂ СЃРѕС…СЂР°РЅС‘РЅ!');
+}
+
+function deleteProd(id) {
+  if (!confirm('РЈРґР°Р»РёС‚СЊ С‚РѕРІР°СЂ?')) return;
+  D.products = D.products.filter(x => x.id !== id);
+  save(); renderAdminProducts(); toast('рџ—‘ РўРѕРІР°СЂ СѓРґР°Р»С‘РЅ');
+}
+
+// в”Ђв”Ђ SETTINGS в”Ђв”Ђ
+function loadSettings() {
+  const s = D.settings;
+  document.getElementById('s-name').value = s.name || '';
+  document.getElementById('s-badge').value = s.badge || '';
+  document.getElementById('s-sub').value = s.sub || '';
+  document.getElementById('s-tg').value = s.tg || '';
+  document.getElementById('s-email').value = s.email || '';
+  document.getElementById('s-stat3').value = s.stat3 || '';
+}
+
+function saveSettings() {
+  D.settings = {
+    name: document.getElementById('s-name').value.trim() || 'Spike_shop',
+    badge: document.getElementById('s-badge').value.trim(),
+    sub: document.getElementById('s-sub').value.trim(),
+    tg: document.getElementById('s-tg').value.trim(),
+    email: document.getElementById('s-email').value.trim(),
+    stat3: document.getElementById('s-stat3').value.trim()
+  };
+  const p1 = document.getElementById('s-pass1').value;
+  const p2 = document.getElementById('s-pass2').value;
+  if (p1) {
+    if (p1 !== p2) { toast('вљ пёЏ РџР°СЂРѕР»Рё РЅРµ СЃРѕРІРїР°РґР°СЋС‚!'); return; }
+    if (p1.length < 4) { toast('вљ пёЏ РџР°СЂРѕР»СЊ РјРёРЅРёРјСѓРј 4 СЃРёРјРІРѕР»Р°'); return; }
+    D.pass = p1;
+    document.getElementById('s-pass1').value = '';
+    document.getElementById('s-pass2').value = '';
+    toast('рџ”ђ РџР°СЂРѕР»СЊ РёР·РјРµРЅС‘РЅ!');
+  }
+  save(); toast('вњ… РќР°СЃС‚СЂРѕР№РєРё СЃРѕС…СЂР°РЅРµРЅС‹!');
+}
+
+// в”Ђв”Ђ FAQ в”Ђв”Ђ
+function renderAdminFaq() {
+  document.getElementById('faq-admin-list').innerHTML = D.faq.map(f =>
+    '<div class="faq-row">' +
+    '<div class="faq-row-texts"><div class="faq-row-q">вќ“ ' + f.q + '</div><div class="faq-row-a">' + f.a + '</div></div>' +
+    '<div class="faq-row-actions">' +
+    '<button class="btn-edit" onclick="openFaqForm(' + f.id + ')">вњЏпёЏ</button>' +
+    '<button class="btn-del" onclick="deleteFaq(' + f.id + ')">рџ—‘</button>' +
+    '</div></div>'
+  ).join('') || '<div style="color:var(--muted);padding:1rem;text-align:center">Р’РѕРїСЂРѕСЃРѕРІ РЅРµС‚</div>';
+}
+
+function openFaqForm(id) {
+  editFaqId = id || null;
+  document.getElementById('faq-form').style.display = 'block';
+  if (id) { const f = D.faq.find(x => x.id === id); document.getElementById('faq-q-in').value = f.q; document.getElementById('faq-a-in').value = f.a; }
+  else { document.getElementById('faq-q-in').value = ''; document.getElementById('faq-a-in').value = ''; }
+}
+
+function closeFaqForm() { document.getElementById('faq-form').style.display = 'none'; editFaqId = null; }
+
+function saveFaq() {
+  const q = document.getElementById('faq-q-in').value.trim();
+  const a = document.getElementById('faq-a-in').value.trim();
+  if (!q || !a) { toast('вљ пёЏ Р—Р°РїРѕР»РЅРёС‚Рµ РІРѕРїСЂРѕСЃ Рё РѕС‚РІРµС‚'); return; }
+  if (editFaqId) { const f = D.faq.find(x => x.id === editFaqId); if (f) { f.q = q; f.a = a; } }
+  else D.faq.push({ id: uid(), q, a });
+  save(); renderAdminFaq(); closeFaqForm(); toast('вњ… FAQ СЃРѕС…СЂР°РЅС‘РЅ');
+}
+
+function deleteFaq(id) {
+  if (!confirm('РЈРґР°Р»РёС‚СЊ РІРѕРїСЂРѕСЃ?')) return;
+  D.faq = D.faq.filter(x => x.id !== id); save(); renderAdminFaq();
+}
+
+// в”Ђв”Ђ ORDERS в”Ђв”Ђ
+function renderAdminOrders() {
+  const el = document.getElementById('orders-list-el');
+  if (!D.orders.length) { el.innerHTML = '<div class="no-orders">рџ“­ Р—Р°РєР°Р·РѕРІ РїРѕРєР° РЅРµС‚</div>'; return; }
+  el.innerHTML = D.orders.map(o =>
+    '<div class="order-row">' +
+    '<div class="order-header">' +
+    '<div class="order-id">#' + String(o.id).slice(-6) + ' вЂ” ' + o.name + '</div>' +
+    '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+    '<span class="order-status ' + (o.status === 'done' ? 'status-done' : 'status-new') + '">' + (o.status === 'done' ? 'вњ… Р’С‹РїРѕР»РЅРµРЅ' : 'рџ”” РќРѕРІС‹Р№') + '</span>' +
+    (o.status !== 'done' ? '<button class="btn-edit" style="font-size:11px;padding:4px 10px" onclick="doneOrder(' + o.id + ')">Р’С‹РїРѕР»РЅРµРЅ вњ“</button>' : '') +
+    '</div></div>' +
+    '<div class="order-details">рџ“± ' + (o.tg || o.contact) + ' В· рџЋ® ' + o.nick + ' В· ' + o.game + '<br>рџ“¦ ' + o.items.join(', ') + '<br>рџ’° <strong>' + o.total + ' в‚Ѕ (' + (o.currency || 'RUB') + ')</strong> В· рџ•ђ ' + o.time + '</div>' +
+    '</div>'
+  ).join('');
+}
+
+function doneOrder(id) {
+  const o = D.orders.find(x => x.id === id); if (o) { o.status = 'done'; save(); renderAdminOrders(); toast('вњ… Р—Р°РєР°Р· РІС‹РїРѕР»РЅРµРЅ'); }
+}
+
+// в”Ђв”Ђ INIT в”Ђв”Ђ
+renderAdminProducts();
+renderAdminFaq();
+loadSettings();
+</script>
+</body>
+</html>
